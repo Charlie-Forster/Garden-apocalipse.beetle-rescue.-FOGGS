@@ -2,5 +2,5 @@
 
 //Entry Point for Application
 int main(int argc, char* argv[]) {
-	Pacman* game = new Pacman(argc, argv);
+	Player1* game = new Player1(argc, argv);
 }
