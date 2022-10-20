@@ -2,9 +2,11 @@
 
 #include <sstream>
 
-Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
+Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv), _cPlayerSpeed(0.1f)
 {
 	_frameCount = 0;
+
+	_paused = false;
 
 	//Initialise important Game aspects
 	Graphics::Initialise(argc, argv, this, 1024, 768, false, 25, 25, "Pacman", 60);
@@ -25,7 +27,7 @@ Pacman::~Pacman()
 
 void Pacman::LoadContent()
 {
-	// Load Pacman
+	// Load Player
 	_pacmanTexture = new Texture2D();
 	_pacmanTexture->Load("Textures/Pacman.tga", false);
 	_pacmanPosition = new Vector2(350.0f, 350.0f);
@@ -40,6 +42,12 @@ void Pacman::LoadContent()
 
 	// Set string position
 	_stringPosition = new Vector2(10.0f, 25.0f);
+
+	//set menu parameters
+	_menuBackground = new Texture2D();
+	_menuBackground->Load("Textures/Transparency.png", false);
+		_menuRectangle = new Rect(0.0f, 0.0f, Graphics::GetViewportWidth(), Graphics::GetViewportHeight());
+		_menuStringPosition = new Vector2(Graphics::GetViewportWidth() / 2.0f, Graphics::GetViewportHeight() / 2.0f);
 }
 
 void Pacman::Update(int elapsedTime)
@@ -49,29 +57,29 @@ void Pacman::Update(int elapsedTime)
 
 	// Checks if D key is pressed
 	if (keyboardState->IsKeyDown(Input::Keys::D))
-		_pacmanPosition->X += 0.1f * elapsedTime; //Moves Pacman across X axis
+		_pacmanPosition->X += _cPlayerSpeed * elapsedTime; //Moves Pacman across X axis
 
 	if (keyboardState->IsKeyDown(Input::Keys::A))
-		_pacmanPosition->X -= 0.1f * elapsedTime;
+		_pacmanPosition->X -= _cPlayerSpeed * elapsedTime;
 
 	if (keyboardState->IsKeyDown(Input::Keys::S))
-		_pacmanPosition->Y += 0.1f * elapsedTime;
+		_pacmanPosition->Y += _cPlayerSpeed * elapsedTime;
 
 	if (keyboardState->IsKeyDown(Input::Keys::W))
-		_pacmanPosition->Y -= 0.1f * elapsedTime;
+		_pacmanPosition->Y -= _cPlayerSpeed * elapsedTime;
 
 	//collision with screen edges
-	if (_pacmanPosition->X > 1024)
+	if (_pacmanPosition->X > Graphics::GetViewportWidth())
 		_pacmanPosition->X = 0 - _pacmanSourceRect->Width;
 
 	if (_pacmanPosition->X < 0 - _pacmanSourceRect->Width)
-		_pacmanPosition->X = 1024;
+		_pacmanPosition->X = Graphics::GetViewportWidth();
 
-	if (_pacmanPosition->Y > 768)
+	if (_pacmanPosition->Y > Graphics::GetViewportHeight())
 		_pacmanPosition->Y = 0 - _pacmanSourceRect->Height;
 
 	if (_pacmanPosition->Y < 0 - _pacmanSourceRect->Height)
-		_pacmanPosition->Y = 768;
+		_pacmanPosition->Y = Graphics::GetViewportHeight();
 }
 
 void Pacman::Draw(int elapsedTime)
