@@ -8,8 +8,8 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 {
 	_frameCount = 0;
 	_paused = false;
-
-	_paused = false;
+	_pKeyDown = false;
+	
 
 	//Initialise important Game aspects
 	Graphics::Initialise(argc, argv, this, 1024, 768, false, 25, 25, "Pacman", 60);
@@ -26,12 +26,13 @@ Player1::~Player1()
 	delete _collectableBlueTexture;
 	delete _collectableInvertedTexture;
 	delete _collectableRect;
+	delete _menuBackground;
+	delete _menuRectangle;
+	delete _menuStringPosition;
 }
 
 void Player1::LoadContent()
 {
-
-
 
 	// Load Player
 	_playerTexture = new Texture2D();
@@ -63,35 +64,51 @@ void Player1::Update(int elapsedTime)
 	Input::KeyboardState* keyboardState = Input::Keyboard::GetState();
 
 
-	// Checks if WASD keys are pressed and moves the player accordingly
-	if (keyboardState->IsKeyDown(Input::Keys::D))
+	if (keyboardState->IsKeyDown(Input::Keys::P) && !_pKeyDown)
 	{
-		_playerPosition->X += _cPacmanSpeed * elapsedTime; 
-		_playerSourceRect->X = 32;
+		_pKeyDown = true;
+		_paused = !_paused;
 	}
-     if (keyboardState->IsKeyDown(Input::Keys::A))
-		_playerPosition->X -= _cPacmanSpeed * elapsedTime;
+	if (keyboardState->IsKeyUp(Input::Keys::P))
+	{
+		_pKeyDown = false;
+	}
 
-	 if (keyboardState->IsKeyDown(Input::Keys::S))
-		_playerPosition->Y += _cPacmanSpeed * elapsedTime;
+	if (!_paused)
+	{
+		
 
-	 if (keyboardState->IsKeyDown(Input::Keys::W))
-		_playerPosition->Y -= _cPacmanSpeed * elapsedTime;
+		// Checks if WASD keys are pressed and moves the player accordingly
+		if (keyboardState->IsKeyDown(Input::Keys::D))
+		{
+			_playerPosition->X += _cPacmanSpeed * elapsedTime;
+			
+		}
+		if (keyboardState->IsKeyDown(Input::Keys::A))
+			_playerPosition->X -= _cPacmanSpeed * elapsedTime;
+
+		if (keyboardState->IsKeyDown(Input::Keys::S))
+			_playerPosition->Y += _cPacmanSpeed * elapsedTime;
+
+		if (keyboardState->IsKeyDown(Input::Keys::W))
+			_playerPosition->Y -= _cPacmanSpeed * elapsedTime;
 
 
 
-	//collision with screen edges
-	if (_playerPosition->X > Graphics::GetViewportWidth())
-		_playerPosition->X = 0 - _playerSourceRect->Width;
 
-	if (_playerPosition->X < 0 - _playerSourceRect->Width)
-		_playerPosition->X = Graphics::GetViewportWidth();
+		//collision with screen edges
+		if (_playerPosition->X > Graphics::GetViewportWidth())
+			_playerPosition->X = 0 - _playerSourceRect->Width;
 
-	if (_playerPosition->Y > Graphics::GetViewportHeight())
-		_playerPosition->Y = 0 - _playerSourceRect->Height;
+		if (_playerPosition->X < 0 - _playerSourceRect->Width)
+			_playerPosition->X = Graphics::GetViewportWidth();
 
-	if (_playerPosition->Y < 0 - _playerSourceRect->Height)
-		_playerPosition->Y = Graphics::GetViewportHeight();
+		if (_playerPosition->Y > Graphics::GetViewportHeight())
+			_playerPosition->Y = 0 - _playerSourceRect->Height;
+
+		if (_playerPosition->Y < 0 - _playerSourceRect->Height)
+			_playerPosition->Y = Graphics::GetViewportHeight();
+	}
 }
 
 void Player1::Draw(int elapsedTime)
@@ -104,86 +121,99 @@ void Player1::Draw(int elapsedTime)
 
 	SpriteBatch::BeginDraw(); // Starts Drawing
 	
-	
-	if (_frameCount < 30)
-	{
-		// Draws Red Munchie
-		SpriteBatch::Draw(_collectableInvertedTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
 
-		if (keyboardState->IsKeyDown(Input::Keys::D))
+		if (_frameCount < 30)
 		{
-			_playerSourceRect->Y = 0;
-			_playerSourceRect->X = 32;
+			// Draws Red Munchie
+			SpriteBatch::Draw(_collectableInvertedTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
+			
+			if (!_paused)
+			{
+				if (keyboardState->IsKeyDown(Input::Keys::D))
+				{
+					_playerSourceRect->Y = 0;
+					_playerSourceRect->X = 32;
 
-		}
-		else if (keyboardState->IsKeyDown(Input::Keys::A))
-		{
-			_playerSourceRect->Y = 64;
-			_playerSourceRect->X = 32;
-		}
-		else if (keyboardState->IsKeyDown(Input::Keys::S))
-		{
-			_playerSourceRect->Y = 32;
-			_playerSourceRect->X = 0;
-		}
+				}
+				else if (keyboardState->IsKeyDown(Input::Keys::A))
+				{
+					_playerSourceRect->Y = 64;
+					_playerSourceRect->X = 32;
+				}
+				else if (keyboardState->IsKeyDown(Input::Keys::S))
+				{
+					_playerSourceRect->Y = 32;
+					_playerSourceRect->X = 0;
+				}
 
-		else if (keyboardState->IsKeyDown(Input::Keys::W))
-		{
-			_playerSourceRect->Y = 32;
-			_playerSourceRect->X = 0;
+				else if (keyboardState->IsKeyDown(Input::Keys::W))
+				{
+					_playerSourceRect->Y = 32;
+					_playerSourceRect->X = 0;
+				}
+				else
+				{
+					_playerSourceRect->Y = 0;
+					_playerSourceRect->X = 0;
+				}
+
+				_frameCount++;
+			}
 		}
 		else
 		{
-			_playerSourceRect->Y = 0;
-			_playerSourceRect->X = 0;
-		}
-		
-		_frameCount++;
-		
-	}
-	else
-	{
-		// Draw Blue Munchie
-		SpriteBatch::Draw(_collectableBlueTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
-		
-		if (keyboardState->IsKeyDown(Input::Keys::D))
-		{
-			_playerSourceRect->Y = 0;
-			_playerSourceRect->X = 0;
+			// Draw Blue Munchie
+			SpriteBatch::Draw(_collectableBlueTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
 
-		}
-		else if (keyboardState->IsKeyDown(Input::Keys::A))
-		{
-			_playerSourceRect->Y = 64;
-			_playerSourceRect->X = 0;
-		}
-		else if (keyboardState->IsKeyDown(Input::Keys::S))
-		{
-			_playerSourceRect->Y = 32;
-			_playerSourceRect->X = 0;
-		}
+			if (!_paused)
+			{
+				if (keyboardState->IsKeyDown(Input::Keys::D))
+				{
+					_playerSourceRect->Y = 0;
+					_playerSourceRect->X = 0;
 
-		else if (keyboardState->IsKeyDown(Input::Keys::W))
-		{
-			_playerSourceRect->Y = 32;
-			_playerSourceRect->X = 0;
-		}
-		else
-		{
-			_playerSourceRect->Y = 0;
-			_playerSourceRect->X = 0;
-		}
+				}
+				else if (keyboardState->IsKeyDown(Input::Keys::A))
+				{
+					_playerSourceRect->Y = 64;
+					_playerSourceRect->X = 0;
+				}
+				else if (keyboardState->IsKeyDown(Input::Keys::S))
+				{
+					_playerSourceRect->Y = 32;
+					_playerSourceRect->X = 0;
+				}
 
-		
-		_frameCount++;
+				else if (keyboardState->IsKeyDown(Input::Keys::W))
+				{
+					_playerSourceRect->Y = 32;
+					_playerSourceRect->X = 0;
+				}
+				else
+				{
+					_playerSourceRect->Y = 0;
+					_playerSourceRect->X = 0;
+				}
 
 
-		if (_frameCount >= 60)
-			_frameCount = 0;
-	}
+				_frameCount++;
+			}
+
+			if (_frameCount >= 60)
+				_frameCount = 0;
+		}
+
 	SpriteBatch::Draw(_playerTexture, _playerPosition, _playerSourceRect); // Draws Pacman
-
 	// Draws String
+
 	SpriteBatch::DrawString(stream.str().c_str(), _stringPosition, Color::Green);
+	if (_paused)
+	{
+		std::stringstream menuStream;
+		menuStream << "paused!";
+
+		SpriteBatch::Draw(_menuBackground, _menuRectangle, nullptr);
+		SpriteBatch::DrawString(menuStream.str().c_str(), _menuStringPosition, Color::Red);
+	}
 	SpriteBatch::EndDraw(); // Ends Drawing
 }

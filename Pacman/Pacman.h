@@ -42,6 +42,8 @@ private:
 	Rect* _menuRectangle;
 	Vector2* _menuStringPosition;
 	bool _paused;
+	bool _pKeyDown;
+	
 
 public:
 	/// <summary> Constructs the Player1 class. </summary>
