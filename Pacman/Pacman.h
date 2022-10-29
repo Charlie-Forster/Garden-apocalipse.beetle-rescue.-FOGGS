@@ -24,12 +24,23 @@ private:
 	Vector2* _playerPosition;
 	Rect* _playerSourceRect;
 	Texture2D* _playerTexture;
+<<<<<<< Updated upstream
+=======
+	int _playerDirection;
+	int _playerFrame;
+	int _playerCurrentFrameTime;
+	const int _cPlayerFrameTime;
+	bool leftOrRight;
+>>>>>>> Stashed changes
 
 	// Data to represent Collectable
-	int _frameCount;
+	int _munchieFrameCount;
 	Rect* _collectableRect;
 	Texture2D* _collectableBlueTexture;
 	Texture2D* _collectableInvertedTexture;
+	const int _cMunchieFrameTime;
+	int _munchieFrame;
+	int _munchieCurrentFrameTime;
 
 	// Position for String
 	Vector2* _stringPosition;

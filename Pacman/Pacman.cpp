@@ -4,12 +4,24 @@
 
 
 
+<<<<<<< Updated upstream
 Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
+=======
+Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f), _cPlayerFrameTime(250), _cMunchieFrameTime(500)
+>>>>>>> Stashed changes
 {
-	_frameCount = 0;
+	_munchieFrameCount = 0;
 	_paused = false;
 	_pKeyDown = false;
+<<<<<<< Updated upstream
 	
+=======
+	_playerDirection = 0;
+	_playerCurrentFrameTime = 0;
+	_playerFrame = 0;
+	leftOrRight = true;
+	_munchieCurrentFrameTime = 0;
+>>>>>>> Stashed changes
 
 	//Initialise important Game aspects
 	Graphics::Initialise(argc, argv, this, 1024, 768, false, 25, 25, "Pacman", 60);
@@ -36,7 +48,7 @@ void Player1::LoadContent()
 
 	// Load Player
 	_playerTexture = new Texture2D();
-	_playerTexture->Load("Textures/wormcreature.tga", false);
+	_playerTexture->Load("Textures/wormcreature2.tga", false);
 	_playerPosition = new Vector2(350.0f, 350.0f);
 	_playerSourceRect = new Rect(0.0f, 0.0f, 32, 32);
 	
@@ -76,23 +88,62 @@ void Player1::Update(int elapsedTime)
 
 	if (!_paused)
 	{
+		bool isMoving = false;
 		
-
+		
 		// Checks if WASD keys are pressed and moves the player accordingly
 		if (keyboardState->IsKeyDown(Input::Keys::D))
 		{
 			_playerPosition->X += _cPacmanSpeed * elapsedTime;
+<<<<<<< Updated upstream
 			
+=======
+			_playerDirection = 0;
+			isMoving = true;
+			leftOrRight = true;
+>>>>>>> Stashed changes
 		}
 		if (keyboardState->IsKeyDown(Input::Keys::A))
 			_playerPosition->X -= _cPacmanSpeed * elapsedTime;
+<<<<<<< Updated upstream
 
+=======
+			_playerDirection = 2;
+			isMoving = true;
+			leftOrRight = false;
+		}
+>>>>>>> Stashed changes
 		if (keyboardState->IsKeyDown(Input::Keys::S))
 			_playerPosition->Y += _cPacmanSpeed * elapsedTime;
+<<<<<<< Updated upstream
+=======
+			isMoving = true;
+>>>>>>> Stashed changes
 
+			if (leftOrRight == true)
+				_playerDirection = 0;
+			else
+				_playerDirection = 2;
+		}
 		if (keyboardState->IsKeyDown(Input::Keys::W))
 			_playerPosition->Y -= _cPacmanSpeed * elapsedTime;
+<<<<<<< Updated upstream
+=======
+			isMoving = true;
+>>>>>>> Stashed changes
 
+			if (leftOrRight == true)
+				_playerDirection = 0;
+			else
+				_playerDirection = 2;
+		}
+		if (isMoving == false)
+		{
+			if (leftOrRight == true)
+				_playerDirection = 1;
+			else
+			_playerDirection = 3;
+		}
 
 
 
@@ -108,12 +159,43 @@ void Player1::Update(int elapsedTime)
 
 		if (_playerPosition->Y < 0 - _playerSourceRect->Height)
 			_playerPosition->Y = Graphics::GetViewportHeight();
+<<<<<<< Updated upstream
 	}
+=======
+
+
+		//runs animations based on the framerate
+		_playerCurrentFrameTime += elapsedTime;
+
+		if (_playerCurrentFrameTime > _cPlayerFrameTime)
+		{
+			_playerFrame++;
+			if (_playerFrame >= 2)
+			{
+				_playerFrame = 0;
+			}
+			_playerCurrentFrameTime = 0;
+		}
+	}
+	_playerSourceRect->Y = _playerSourceRect->Height * _playerDirection;
+	_playerSourceRect->X = _playerSourceRect->Width * _playerFrame;
+
+	_munchieCurrentFrameTime += elapsedTime;
+
+	if (_munchieCurrentFrameTime > _cMunchieFrameTime)
+	{
+		_munchieFrameCount++;
+
+		if (_munchieFrameCount >= 2)
+			_munchieFrameCount = 0;
+		_munchieCurrentFrameTime = 0;
+	}
+>>>>>>> Stashed changes
 }
 
 void Player1::Draw(int elapsedTime)
 {
-	Input::KeyboardState* keyboardState = Input::Keyboard::GetState();
+	
 	
 	// Allows us to easily create a string
 	std::stringstream stream;
@@ -122,6 +204,7 @@ void Player1::Draw(int elapsedTime)
 	SpriteBatch::BeginDraw(); // Starts Drawing
 	
 
+<<<<<<< Updated upstream
 		if (_frameCount < 30)
 		{
 			// Draws Red Munchie
@@ -159,12 +242,20 @@ void Player1::Draw(int elapsedTime)
 
 				_frameCount++;
 			}
+=======
+	
+		if (_munchieFrameCount == 0)
+		{
+			// Draws Red Munchie
+			SpriteBatch::Draw(_collectableInvertedTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
+>>>>>>> Stashed changes
 		}
 		else
 		{
 			// Draw Blue Munchie
 			SpriteBatch::Draw(_collectableBlueTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
 
+<<<<<<< Updated upstream
 			if (!_paused)
 			{
 				if (keyboardState->IsKeyDown(Input::Keys::D))
@@ -201,6 +292,8 @@ void Player1::Draw(int elapsedTime)
 
 			if (_frameCount >= 60)
 				_frameCount = 0;
+=======
+>>>>>>> Stashed changes
 		}
 
 	SpriteBatch::Draw(_playerTexture, _playerPosition, _playerSourceRect); // Draws Pacman
