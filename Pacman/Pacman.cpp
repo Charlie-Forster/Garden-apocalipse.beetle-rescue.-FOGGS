@@ -4,24 +4,24 @@
 
 
 
-<<<<<<< Updated upstream
-Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
-=======
+
+
+
 Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f), _cPlayerFrameTime(250), _cMunchieFrameTime(500)
->>>>>>> Stashed changes
+
 {
 	_munchieFrameCount = 0;
 	_paused = false;
 	_pKeyDown = false;
-<<<<<<< Updated upstream
+
 	
-=======
+
 	_playerDirection = 0;
 	_playerCurrentFrameTime = 0;
 	_playerFrame = 0;
 	leftOrRight = true;
 	_munchieCurrentFrameTime = 0;
->>>>>>> Stashed changes
+
 
 	//Initialise important Game aspects
 	Graphics::Initialise(argc, argv, this, 1024, 768, false, 25, 25, "Pacman", 60);
@@ -95,48 +95,42 @@ void Player1::Update(int elapsedTime)
 		if (keyboardState->IsKeyDown(Input::Keys::D))
 		{
 			_playerPosition->X += _cPacmanSpeed * elapsedTime;
-<<<<<<< Updated upstream
+
 			
-=======
+
 			_playerDirection = 0;
 			isMoving = true;
 			leftOrRight = true;
->>>>>>> Stashed changes
+
 		}
 		if (keyboardState->IsKeyDown(Input::Keys::A))
+		{
 			_playerPosition->X -= _cPacmanSpeed * elapsedTime;
-<<<<<<< Updated upstream
-
-=======
 			_playerDirection = 2;
 			isMoving = true;
 			leftOrRight = false;
 		}
->>>>>>> Stashed changes
+
 		if (keyboardState->IsKeyDown(Input::Keys::S))
+		{
 			_playerPosition->Y += _cPacmanSpeed * elapsedTime;
-<<<<<<< Updated upstream
-=======
 			isMoving = true;
->>>>>>> Stashed changes
-
 			if (leftOrRight == true)
 				_playerDirection = 0;
 			else
 				_playerDirection = 2;
 		}
+
 		if (keyboardState->IsKeyDown(Input::Keys::W))
+		{
 			_playerPosition->Y -= _cPacmanSpeed * elapsedTime;
-<<<<<<< Updated upstream
-=======
 			isMoving = true;
->>>>>>> Stashed changes
-
 			if (leftOrRight == true)
 				_playerDirection = 0;
 			else
 				_playerDirection = 2;
 		}
+
 		if (isMoving == false)
 		{
 			if (leftOrRight == true)
@@ -159,9 +153,9 @@ void Player1::Update(int elapsedTime)
 
 		if (_playerPosition->Y < 0 - _playerSourceRect->Height)
 			_playerPosition->Y = Graphics::GetViewportHeight();
-<<<<<<< Updated upstream
+
 	}
-=======
+
 
 
 		//runs animations based on the framerate
@@ -176,7 +170,7 @@ void Player1::Update(int elapsedTime)
 			}
 			_playerCurrentFrameTime = 0;
 		}
-	}
+	
 	_playerSourceRect->Y = _playerSourceRect->Height * _playerDirection;
 	_playerSourceRect->X = _playerSourceRect->Width * _playerFrame;
 
@@ -190,123 +184,59 @@ void Player1::Update(int elapsedTime)
 			_munchieFrameCount = 0;
 		_munchieCurrentFrameTime = 0;
 	}
->>>>>>> Stashed changes
+
 }
 
 void Player1::Draw(int elapsedTime)
 {
-	
-	
+
+
 	// Allows us to easily create a string
 	std::stringstream stream;
 	stream << "Pacman X: " << _playerPosition->X << " Y: " << _playerPosition->Y;
 
 	SpriteBatch::BeginDraw(); // Starts Drawing
-	
 
-<<<<<<< Updated upstream
-		if (_frameCount < 30)
-		{
-			// Draws Red Munchie
-			SpriteBatch::Draw(_collectableInvertedTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
-			
-			if (!_paused)
-			{
-				if (keyboardState->IsKeyDown(Input::Keys::D))
-				{
-					_playerSourceRect->Y = 0;
-					_playerSourceRect->X = 32;
 
-				}
-				else if (keyboardState->IsKeyDown(Input::Keys::A))
-				{
-					_playerSourceRect->Y = 64;
-					_playerSourceRect->X = 32;
-				}
-				else if (keyboardState->IsKeyDown(Input::Keys::S))
-				{
-					_playerSourceRect->Y = 32;
-					_playerSourceRect->X = 0;
-				}
+	if (_munchieFrameCount < 30)
+	{
+		// Draws Red Munchie
+		SpriteBatch::Draw(_collectableInvertedTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
 
-				else if (keyboardState->IsKeyDown(Input::Keys::W))
-				{
-					_playerSourceRect->Y = 32;
-					_playerSourceRect->X = 0;
-				}
-				else
-				{
-					_playerSourceRect->Y = 0;
-					_playerSourceRect->X = 0;
-				}
 
-				_frameCount++;
-			}
-=======
-	
+
+
 		if (_munchieFrameCount == 0)
 		{
 			// Draws Red Munchie
 			SpriteBatch::Draw(_collectableInvertedTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
->>>>>>> Stashed changes
+
 		}
 		else
 		{
 			// Draw Blue Munchie
 			SpriteBatch::Draw(_collectableBlueTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
 
-<<<<<<< Updated upstream
-			if (!_paused)
-			{
-				if (keyboardState->IsKeyDown(Input::Keys::D))
-				{
-					_playerSourceRect->Y = 0;
-					_playerSourceRect->X = 0;
-
-				}
-				else if (keyboardState->IsKeyDown(Input::Keys::A))
-				{
-					_playerSourceRect->Y = 64;
-					_playerSourceRect->X = 0;
-				}
-				else if (keyboardState->IsKeyDown(Input::Keys::S))
-				{
-					_playerSourceRect->Y = 32;
-					_playerSourceRect->X = 0;
-				}
-
-				else if (keyboardState->IsKeyDown(Input::Keys::W))
-				{
-					_playerSourceRect->Y = 32;
-					_playerSourceRect->X = 0;
-				}
-				else
-				{
-					_playerSourceRect->Y = 0;
-					_playerSourceRect->X = 0;
-				}
 
 
-				_frameCount++;
-			}
 
-			if (_frameCount >= 60)
-				_frameCount = 0;
-=======
->>>>>>> Stashed changes
+			if (_munchieFrameCount >= 60)
+				_munchieFrameCount = 0;
+
 		}
 
-	SpriteBatch::Draw(_playerTexture, _playerPosition, _playerSourceRect); // Draws Pacman
-	// Draws String
+		SpriteBatch::Draw(_playerTexture, _playerPosition, _playerSourceRect); // Draws Pacman
+		// Draws String
 
-	SpriteBatch::DrawString(stream.str().c_str(), _stringPosition, Color::Green);
-	if (_paused)
-	{
-		std::stringstream menuStream;
-		menuStream << "paused!";
+		SpriteBatch::DrawString(stream.str().c_str(), _stringPosition, Color::Green);
+		if (_paused)
+		{
+			std::stringstream menuStream;
+			menuStream << "paused!";
 
-		SpriteBatch::Draw(_menuBackground, _menuRectangle, nullptr);
-		SpriteBatch::DrawString(menuStream.str().c_str(), _menuStringPosition, Color::Red);
+			SpriteBatch::Draw(_menuBackground, _menuRectangle, nullptr);
+			SpriteBatch::DrawString(menuStream.str().c_str(), _menuStringPosition, Color::Red);
+		}
+		SpriteBatch::EndDraw(); // Ends Drawing
 	}
-	SpriteBatch::EndDraw(); // Ends Drawing
 }

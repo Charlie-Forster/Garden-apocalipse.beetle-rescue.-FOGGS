@@ -24,14 +24,13 @@ private:
 	Vector2* _playerPosition;
 	Rect* _playerSourceRect;
 	Texture2D* _playerTexture;
-<<<<<<< Updated upstream
-=======
+
 	int _playerDirection;
 	int _playerFrame;
 	int _playerCurrentFrameTime;
 	const int _cPlayerFrameTime;
 	bool leftOrRight;
->>>>>>> Stashed changes
+
 
 	// Data to represent Collectable
 	int _munchieFrameCount;
