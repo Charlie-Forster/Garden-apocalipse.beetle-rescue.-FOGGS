@@ -63,8 +63,8 @@ private:
 	void CheckPaused(Input::KeyboardState* state, Input::Keys pauseKeys);
 
 	//Update method
-	void UpdatePlayer(int elapsedTime);
-	void UpdateCollectable(int elapsedTime);
+	void UpdatePlayerAnimation(int elapsedTime);
+	void UpdateCollectableAnimation(int elapsedTime);
 public:
 	
 

@@ -70,112 +70,23 @@ void Player1::LoadContent()
 
 void Player1::Update(int elapsedTime)
 {
-	// Gets the current state of the keyboard
-	Input::KeyboardState* keyboardState = Input::Keyboard::GetState();
+	//check the keyboard state to set the paramiter variable for the input method and the check paused method
+	Input::KeyboardState* state = Input::Keyboard::GetState();
 
+
+	//call the pause method
+	CheckPaused(state, Input::Keys::P );
 	
-	//need to call the paused method
+
+	//updates animations based on framerate
 	if (!_paused)
 	{
-		bool isMoving = false;
-		
-		
-		// Checks if WASD keys are pressed and moves the player accordingly
-		if (keyboardState->IsKeyDown(Input::Keys::D))
-		{
-			_playerPosition->X += _cPacmanSpeed * elapsedTime;
-
-			
-
-			_playerDirection = 0;
-			isMoving = true;
-			leftOrRight = true;
-
-		}
-		if (keyboardState->IsKeyDown(Input::Keys::A))
-		{
-			_playerPosition->X -= _cPacmanSpeed * elapsedTime;
-			_playerDirection = 2;
-			isMoving = true;
-			leftOrRight = false;
-		}
-
-		if (keyboardState->IsKeyDown(Input::Keys::S))
-		{
-			_playerPosition->Y += _cPacmanSpeed * elapsedTime;
-			isMoving = true;
-			if (leftOrRight == true)
-				_playerDirection = 0;
-			else
-				_playerDirection = 2;
-		}
-
-		if (keyboardState->IsKeyDown(Input::Keys::W))
-		{
-			_playerPosition->Y -= _cPacmanSpeed * elapsedTime;
-			isMoving = true;
-			if (leftOrRight == true)
-				_playerDirection = 0;
-			else
-				_playerDirection = 2;
-		}
-
-		if (isMoving == false)
-		{
-			if (leftOrRight == true)
-				_playerDirection = 1;
-			else
-			_playerDirection = 3;
-		}
-
-
-
-		//collision with screen edges
-		if (_playerPosition->X > Graphics::GetViewportWidth())
-			_playerPosition->X = 0 - _playerSourceRect->Width;
-
-		if (_playerPosition->X < 0 - _playerSourceRect->Width)
-			_playerPosition->X = Graphics::GetViewportWidth();
-
-		if (_playerPosition->Y > Graphics::GetViewportHeight())
-			_playerPosition->Y = 0 - _playerSourceRect->Height;
-
-		if (_playerPosition->Y < 0 - _playerSourceRect->Height)
-			_playerPosition->Y = Graphics::GetViewportHeight();
-
+		Input(elapsedTime, state);
+		CheckViewportCollision();
+		UpdatePlayerAnimation(elapsedTime);
+		UpdateCollectableAnimation(elapsedTime);
 	}
 
-
-
-		//runs animations based on the framerate
-		_playerCurrentFrameTime += elapsedTime;
-
-		if (_playerCurrentFrameTime > _cPlayerFrameTime)
-		{
-			_playerFrame++;
-			if (_playerFrame >= 2)
-			{
-				_playerFrame = 0;
-			}
-			_playerCurrentFrameTime = 0;
-		}
-	
-	_playerSourceRect->Y = _playerSourceRect->Height * _playerDirection;
-	_playerSourceRect->X = _playerSourceRect->Width * _playerFrame;
-
-
-	_munchieCurrentFrameTime += elapsedTime;
-
-	if (_munchieCurrentFrameTime > _cMunchieFrameTime)
-	{
-		_munchieFrameCount++;
-
-		if (_munchieFrameCount >= 1)
-			_munchieFrameCount = 0;
-		_munchieCurrentFrameTime = 0;
-	}
-
-	_collectableRect->Y = _collectableRect->Height * _munchieFrameCount;
 }
 
 
@@ -213,25 +124,131 @@ void Player1::Draw(int elapsedTime)
 		
 }
 
-//new methods
+//Update methods
+
 void Player1::Input(int elapsedTime, Input::KeyboardState* state)
 {
+	if (!_paused)
+	{
+		bool isMoving = false;
 
+		// Checks if WASD keys are pressed and moves the player accordingly
+		if (state->IsKeyDown(Input::Keys::D))
+		{
+			_playerPosition->X += _cPacmanSpeed * elapsedTime;
+
+			_playerDirection = 0;
+			isMoving = true;
+			leftOrRight = true;
+
+		}
+		if (state->IsKeyDown(Input::Keys::A))
+		{
+			_playerPosition->X -= _cPacmanSpeed * elapsedTime;
+			_playerDirection = 2;
+			isMoving = true;
+			leftOrRight = false;
+		}
+
+		if (state->IsKeyDown(Input::Keys::S))
+		{
+			_playerPosition->Y += _cPacmanSpeed * elapsedTime;
+			isMoving = true;
+			if (leftOrRight == true)
+				_playerDirection = 0;
+			else
+				_playerDirection = 2;
+		}
+
+		if (state->IsKeyDown(Input::Keys::W))
+		{
+			_playerPosition->Y -= _cPacmanSpeed * elapsedTime;
+			isMoving = true;
+			if (leftOrRight == true)
+				_playerDirection = 0;
+			else
+				_playerDirection = 2;
+		}
+
+		if (isMoving == false)
+		{
+			if (leftOrRight == true)
+				_playerDirection = 1;
+			else
+				_playerDirection = 3;
+		}
+	}
 }
 
 
-void Player1::CheckPaused(Input::KeyboardState* state, Input::Keys pauseKey)
+ void Player1::CheckPaused(Input::KeyboardState* state, Input::Keys pauseKey)
 {
 	Input::KeyboardState* keyboardState = Input::Keyboard::GetState();
 
-	if (keyboardState->IsKeyDown(Input::Keys::P) && !_pKeyDown)
+	if (keyboardState->IsKeyDown(pauseKey) && !_pKeyDown)
 	{
 		_pKeyDown = true;
 		_paused = !_paused;
 	}
-	if (keyboardState->IsKeyUp(Input::Keys::P))
+	if (keyboardState->IsKeyUp(pauseKey))
 	{
 		_pKeyDown = false;
 	}
 }
 
+
+
+void Player1::CheckViewportCollision()
+{
+	//collision with screen edges
+	if (_playerPosition->X > Graphics::GetViewportWidth())
+		_playerPosition->X = 0 - _playerSourceRect->Width;
+
+	if (_playerPosition->X < 0 - _playerSourceRect->Width)
+		_playerPosition->X = Graphics::GetViewportWidth();
+
+	if (_playerPosition->Y > Graphics::GetViewportHeight())
+		_playerPosition->Y = 0 - _playerSourceRect->Height;
+
+	if (_playerPosition->Y < 0 - _playerSourceRect->Height)
+		_playerPosition->Y = Graphics::GetViewportHeight();
+}
+
+
+
+void Player1::UpdatePlayerAnimation(int elapsedTime)
+{
+		//runs player animations based on the framerate
+		_playerCurrentFrameTime += elapsedTime;
+
+		if (_playerCurrentFrameTime > _cPlayerFrameTime)
+		{
+			_playerFrame++;
+			if (_playerFrame >= 2)
+			{
+				_playerFrame = 0;
+			}
+			_playerCurrentFrameTime = 0;
+		}
+
+		_playerSourceRect->Y = _playerSourceRect->Height * _playerDirection;
+		_playerSourceRect->X = _playerSourceRect->Width * _playerFrame;
+}
+
+
+
+void Player1::UpdateCollectableAnimation(int elapsedTime)
+{
+	_munchieCurrentFrameTime += elapsedTime;
+
+	if (_munchieCurrentFrameTime > _cMunchieFrameTime)
+	{
+		_munchieFrameCount++;
+
+		if (_munchieFrameCount >= 1)
+			_munchieFrameCount = 0;
+		_munchieCurrentFrameTime = 0;
+	}
+
+	_collectableRect->Y = _collectableRect->Height * _munchieFrameCount;
+}
