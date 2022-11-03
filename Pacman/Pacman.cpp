@@ -73,17 +73,8 @@ void Player1::Update(int elapsedTime)
 	// Gets the current state of the keyboard
 	Input::KeyboardState* keyboardState = Input::Keyboard::GetState();
 
-
-	if (keyboardState->IsKeyDown(Input::Keys::P) && !_pKeyDown)
-	{
-		_pKeyDown = true;
-		_paused = !_paused;
-	}
-	if (keyboardState->IsKeyUp(Input::Keys::P))
-	{
-		_pKeyDown = false;
-	}
-
+	
+	//need to call the paused method
 	if (!_paused)
 	{
 		bool isMoving = false;
@@ -187,6 +178,8 @@ void Player1::Update(int elapsedTime)
 	_collectableRect->Y = _collectableRect->Height * _munchieFrameCount;
 }
 
+
+
 void Player1::Draw(int elapsedTime)
 {
 
@@ -216,4 +209,29 @@ void Player1::Draw(int elapsedTime)
 		}
 		SpriteBatch::EndDraw(); // Ends Drawing
 	
+
+		
 }
+
+//new methods
+void Player1::Input(int elapsedTime, Input::KeyboardState* state)
+{
+
+}
+
+
+void Player1::CheckPaused(Input::KeyboardState* state, Input::Keys pauseKey)
+{
+	Input::KeyboardState* keyboardState = Input::Keyboard::GetState();
+
+	if (keyboardState->IsKeyDown(Input::Keys::P) && !_pKeyDown)
+	{
+		_pKeyDown = true;
+		_paused = !_paused;
+	}
+	if (keyboardState->IsKeyUp(Input::Keys::P))
+	{
+		_pKeyDown = false;
+	}
+}
+

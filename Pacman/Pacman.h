@@ -55,7 +55,20 @@ private:
 	bool _pKeyDown;
 	
 
+	//input methods
+	void Input(int elapsedTime, Input::KeyboardState* state);
+
+	//check methods
+	void CheckViewportCollision();
+	void CheckPaused(Input::KeyboardState* state, Input::Keys pauseKeys);
+
+	//Update method
+	void UpdatePlayer(int elapsedTime);
+	void UpdateCollectable(int elapsedTime);
 public:
+	
+
+
 	/// <summary> Constructs the Player1 class. </summary>
 	Player1(int argc, char* argv[]);
 
