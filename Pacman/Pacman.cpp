@@ -55,9 +55,7 @@ void Player1::LoadContent()
 
 	// Load Munchie
 	_collectableBlueTexture = new Texture2D();
-	_collectableBlueTexture->Load("Textures/Munchie.tga", true);
-	_collectableInvertedTexture = new Texture2D();
-	_collectableInvertedTexture->Load("Textures/MunchieInverted.tga", true);
+	_collectableBlueTexture->Load("Munchie.png", true);
 	_collectableRect = new Rect(100.0f, 450.0f, 12, 12);
 
 	// Set string position
@@ -174,17 +172,19 @@ void Player1::Update(int elapsedTime)
 	_playerSourceRect->Y = _playerSourceRect->Height * _playerDirection;
 	_playerSourceRect->X = _playerSourceRect->Width * _playerFrame;
 
+
 	_munchieCurrentFrameTime += elapsedTime;
 
 	if (_munchieCurrentFrameTime > _cMunchieFrameTime)
 	{
 		_munchieFrameCount++;
 
-		if (_munchieFrameCount >= 2)
+		if (_munchieFrameCount >= 1)
 			_munchieFrameCount = 0;
 		_munchieCurrentFrameTime = 0;
 	}
 
+	_collectableRect->Y = _collectableRect->Height * _munchieFrameCount;
 }
 
 void Player1::Draw(int elapsedTime)
@@ -197,33 +197,10 @@ void Player1::Draw(int elapsedTime)
 
 	SpriteBatch::BeginDraw(); // Starts Drawing
 
+	
+		// Draw Blue Munchie
+		SpriteBatch::Draw(_collectableBlueTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
 
-	if (_munchieFrameCount < 30)
-	{
-		// Draws Red Munchie
-		SpriteBatch::Draw(_collectableInvertedTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
-
-
-
-
-		if (_munchieFrameCount == 0)
-		{
-			// Draws Red Munchie
-			SpriteBatch::Draw(_collectableInvertedTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
-
-		}
-		else
-		{
-			// Draw Blue Munchie
-			SpriteBatch::Draw(_collectableBlueTexture, _collectableRect, nullptr, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
-
-
-
-
-			if (_munchieFrameCount >= 60)
-				_munchieFrameCount = 0;
-
-		}
 
 		SpriteBatch::Draw(_playerTexture, _playerPosition, _playerSourceRect); // Draws Pacman
 		// Draws String
@@ -238,5 +215,5 @@ void Player1::Draw(int elapsedTime)
 			SpriteBatch::DrawString(menuStream.str().c_str(), _menuStringPosition, Color::Red);
 		}
 		SpriteBatch::EndDraw(); // Ends Drawing
-	}
+	
 }
