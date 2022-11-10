@@ -14,45 +14,63 @@
 // Reduces the amount of typing by including all classes in S2D namespace
 using namespace S2D;
 
-// Declares the Player1 class which inherits from the Game class.
-// This allows us to overload the Game class methods to help us
-// load content, draw and update our game.
-class Player1 : public Game
+struct Player
 {
-private:
 	// Data to represent Player
 	Vector2* _playerPosition;
 	Rect* _playerSourceRect;
 	Texture2D* _playerTexture;
-
 	int _playerDirection;
 	int _playerFrame;
 	int _playerCurrentFrameTime;
-	const int _cPlayerFrameTime;
 	bool leftOrRight;
+};
 
 
+struct Collectable
+{
 	// Data to represent Collectable
 	int _munchieFrameCount;
 	Rect* _collectableRect;
 	Texture2D* _collectableBlueTexture;
 	Texture2D* _collectableInvertedTexture;
-	const int _cMunchieFrameTime;
+	
 	int _munchieFrame;
 	int _munchieCurrentFrameTime;
 
-	// Position for String
-	Vector2* _stringPosition;
+};
 
-	//Constant data for game variables
-	const float _cPacmanSpeed;
-
+struct Menu
+{
 	//Data for Menu
 	Texture2D* _menuBackground;
 	Rect* _menuRectangle;
 	Vector2* _menuStringPosition;
 	bool _paused;
 	bool _pKeyDown;
+};
+
+// Declares the Player1 class which inherits from the Game class.
+// This allows us to overload the Game class methods to help us
+// load content, draw and update our game.
+class Player1 : public Game
+{
+private:
+	
+	//create struct instances
+	Player* Worm;
+	Collectable* collectable;
+	Menu* background;
+
+	// Position for String
+	Vector2* _stringPosition;
+
+	//Constant data for game variables
+	const float _cPacmanSpeed;
+	const int _cPlayerFrameTime;
+	const int _cMunchieFrameTime;
+
+	
 	
 
 	//input methods
