@@ -1,5 +1,5 @@
 #pragma once
-
+#define MUNCHIECOUNT 25
 // If Windows and not in Debug, this will run without a console window
 // You can use this to output information when debugging using cout or cerr
 #ifdef WIN32 
@@ -34,6 +34,7 @@ struct Collectable
 	Rect* _collectableRect;
 	Texture2D* _collectableBlueTexture;
 	Texture2D* _collectableInvertedTexture;
+	Vector2* _collectablePosition;
 	
 	int _munchieFrame;
 	int _munchieCurrentFrameTime;
@@ -59,7 +60,7 @@ private:
 	
 	//create struct instances
 	Player* Worm;
-	Collectable* collectable;
+	Collectable* collectables[MUNCHIECOUNT];
 	Menu* background;
 
 	// Position for String
