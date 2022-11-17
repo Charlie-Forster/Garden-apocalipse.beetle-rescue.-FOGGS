@@ -1,5 +1,5 @@
 #include "Pacman.h"
-
+#include <time.h>
 #include <sstream>
 
 
@@ -10,28 +10,29 @@
 Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f), _cPlayerFrameTime(250), _cMunchieFrameTime(500)
 
 {
-	Worm = new Player();
-
+	
+	//initialise collectables
 	for (int i = 0; i < MUNCHIECOUNT; i++)
 	{
 		collectables[i] = new Collectable();
-		collectables[i]->_munchieFrameCount = 0;
-		collectables[i]->_munchieCurrentFrameTime = 0;
+		collectables[i]->_collectableFrameCount = 0;
+		collectables[i]->_collectableCurrentFrameTime = 0;
 	}
 
+	
+	//initialise draggable cherry
+	cherry = new Collectable();
+	
+	//initialise paused background
 	background = new Menu();
-	
-	
-	
 	background->_paused = false;
 	background->_pKeyDown = false;
 
-
-	
+	//initialise player
+	Worm = new Player();
 	Worm->_playerDirection = 0;
 		Worm->_playerCurrentFrameTime = 0;
 		Worm->_playerFrame = 0;
-	
 		Worm->leftOrRight = true;
 		
 		
@@ -59,7 +60,6 @@ Player1::~Player1()
 	{
 		delete collectables[i]->_collectableBlueTexture;
 		delete collectables[i];
-		delete collectables[i]->_collectableInvertedTexture;
 		delete collectables[i]->_collectableRect;
 	}
 }
@@ -74,15 +74,18 @@ void Player1::LoadContent()
 	Worm->_playerSourceRect = new Rect(0.0f, 0.0f, 32, 32);
 	
 
-	// Load Munchie
+	// Load Collectable
 	for (int i = 0; i < MUNCHIECOUNT; i++)
 	{
 		collectables[i]->_collectableBlueTexture = new Texture2D();
 		collectables[i]->_collectableBlueTexture->Load("Textures/MunchieInverted.png", true);
 		collectables[i]->_collectableRect = new Rect(0.0f, 0.0f, 12, 12);
-		collectables[i]->_collectablePosition = new Vector2(150.0f, 50.0f);
+		collectables[i]->_collectablePosition = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
 	}
 
+	//load cherry
+	cherry->_collectableBlueTexture = new Texture2D();
+	cherry->_collectablePosition;
 	// Set string position
 	_stringPosition = new Vector2(10.0f, 25.0f);
 
@@ -109,7 +112,11 @@ void Player1::Update(int elapsedTime)
 		Input(elapsedTime, state);
 		CheckViewportCollision();
 		UpdatePlayerAnimation(elapsedTime);
-		UpdateCollectableAnimation(elapsedTime);
+
+		for (int i = 0; i < MUNCHIECOUNT; i++)
+		{
+			UpdateCollectableAnimation(elapsedTime, i);
+		}
 	}
 
 }
@@ -133,6 +140,8 @@ void Player1::Draw(int elapsedTime)
 		SpriteBatch::Draw(collectables[i]->_collectableBlueTexture, collectables[i]->_collectablePosition, collectables[i]->_collectableRect, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
 	}
 
+	//draw cherry
+	SpriteBatch::Draw(cherry->_collectableBlueTexture, cherry->_collectablePosition, cherry->_collectableRect, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
 
 		SpriteBatch::Draw(Worm->_playerTexture, Worm->_playerPosition, Worm->_playerSourceRect); // Draws Pacman
 		// Draws String
@@ -265,21 +274,20 @@ void Player1::UpdatePlayerAnimation(int elapsedTime)
 
 
 
-void Player1::UpdateCollectableAnimation(int elapsedTime)
+void Player1::UpdateCollectableAnimation(int elapsedTime, int i)
 {
-	for (int i = 0; i < MUNCHIECOUNT; i++)
-	{
-		collectables[i]->_munchieCurrentFrameTime += elapsedTime;
+	
+		collectables[i]->_collectableCurrentFrameTime += elapsedTime;
 
-		if (collectables[i]->_munchieCurrentFrameTime > _cMunchieFrameTime)
+		if (collectables[i]->_collectableCurrentFrameTime > _cMunchieFrameTime)
 		{
-			collectables[i]->_munchieFrameCount++;
+			collectables[i]->_collectableFrameCount++;
 
-			if (collectables[i]->_munchieFrameCount >= 1)
-				collectables[i]->_munchieFrameCount = 0;
-			collectables[i]->_munchieCurrentFrameTime = 0;
+			if (collectables[i]->_collectableFrameCount >= 2)
+				collectables[i]->_collectableFrameCount = 0;
+			collectables[i]->_collectableCurrentFrameTime = 0;
 		}
 
-		collectables[i]->_collectableRect->Y = collectables[i]->_collectableRect->Height * collectables[i]->_munchieFrameCount;
-	}
+		collectables[i]->_collectableRect->Y = collectables[i]->_collectableRect->Height * collectables[i]->_collectableFrameCount;
+	
 }

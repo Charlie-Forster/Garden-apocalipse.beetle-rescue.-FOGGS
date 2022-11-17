@@ -30,14 +30,12 @@ struct Player
 struct Collectable
 {
 	// Data to represent Collectable
-	int _munchieFrameCount;
+	int _collectableFrameCount;
 	Rect* _collectableRect;
 	Texture2D* _collectableBlueTexture;
-	Texture2D* _collectableInvertedTexture;
 	Vector2* _collectablePosition;
 	
-	int _munchieFrame;
-	int _munchieCurrentFrameTime;
+	int _collectableCurrentFrameTime;
 
 };
 
@@ -62,7 +60,7 @@ private:
 	Player* Worm;
 	Collectable* collectables[MUNCHIECOUNT];
 	Menu* background;
-
+	Collectable* cherry;
 	// Position for String
 	Vector2* _stringPosition;
 
@@ -83,13 +81,13 @@ private:
 
 	//Update method
 	void UpdatePlayerAnimation(int elapsedTime);
-	void UpdateCollectableAnimation(int elapsedTime);
+	void UpdateCollectableAnimation(int elapsedTime, int i);
 public:
 	
 
 
-	/// <summary> Constructs the Player1 class. </summary>
 	Player1(int argc, char* argv[]);
+	/// <summary> Constructs the Player1 class. </summary>
 
 	/// <summary> Destroys any data associated with Player1 class. </summary>
 	virtual ~Player1();
