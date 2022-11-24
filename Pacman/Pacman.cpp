@@ -22,6 +22,7 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 	
 	//initialise draggable cherry
 	cherry = new Collectable();
+	cherry->_rKeyDown = false;
 	
 	//initialise paused background
 	background = new Menu();
@@ -34,6 +35,7 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 		Worm->_playerCurrentFrameTime = 0;
 		Worm->_playerFrame = 0;
 		Worm->leftOrRight = true;
+		Worm->speedMultiplier = 1.0f;
 		
 		
 
@@ -55,6 +57,10 @@ Player1::~Player1()
 	delete background->_menuStringPosition;
 	delete Worm;
 	delete background;
+	delete cherry;
+	delete cherry->_collectableBlueTexture;
+	delete cherry->_collectableRect;
+	delete cherry->_collectablePosition;
 
 	for (int i = 0; i < MUNCHIECOUNT; i++)
 	{
@@ -85,7 +91,9 @@ void Player1::LoadContent()
 
 	//load cherry
 	cherry->_collectableBlueTexture = new Texture2D();
-	cherry->_collectablePosition;
+	cherry->_collectableBlueTexture->Load("Textures/MunchieInverted.png", true);
+	cherry->_collectablePosition = new Vector2(70.0f, 100.0f);
+	cherry->_collectableRect = new Rect(0.0f, 0.0f, 12, 12);
 	// Set string position
 	_stringPosition = new Vector2(10.0f, 25.0f);
 
@@ -98,8 +106,9 @@ void Player1::LoadContent()
 
 void Player1::Update(int elapsedTime)
 {
-	//check the keyboard state to set the paramiter variable for the input method and the check paused method
+	//check the keyboard state and mouse state
 	Input::KeyboardState* state = Input::Keyboard::GetState();
+	Input::MouseState* mouseState = Input::Mouse::GetState();
 
 
 	//call the pause method
@@ -109,7 +118,7 @@ void Player1::Update(int elapsedTime)
 	//updates animations based on framerate
 	if (!background->_paused)
 	{
-		Input(elapsedTime, state);
+		Input(elapsedTime, state, mouseState);
 		CheckViewportCollision();
 		UpdatePlayerAnimation(elapsedTime);
 
@@ -163,16 +172,19 @@ void Player1::Draw(int elapsedTime)
 
 //Update methods
 
-void Player1::Input(int elapsedTime, Input::KeyboardState* state)
+void Player1::Input(int elapsedTime, Input::KeyboardState* state, Input::MouseState* mouseState)
 {
+	float playerSpeed = (_cPacmanSpeed * elapsedTime) * Worm->speedMultiplier;
 	if (!background->_paused)
 	{
 		bool isMoving = false;
 
+		
+
 		// Checks if WASD keys are pressed and moves the player accordingly
 		if (state->IsKeyDown(Input::Keys::D))
 		{
-			Worm->_playerPosition->X += _cPacmanSpeed * elapsedTime;
+			Worm->_playerPosition->X += playerSpeed;
 
 			Worm->_playerDirection = 0;
 			isMoving = true;
@@ -181,7 +193,7 @@ void Player1::Input(int elapsedTime, Input::KeyboardState* state)
 		}
 		if (state->IsKeyDown(Input::Keys::A))
 		{
-			Worm->_playerPosition->X -= _cPacmanSpeed * elapsedTime;
+			Worm->_playerPosition->X -= playerSpeed;
 			Worm->_playerDirection = 2;
 			isMoving = true;
 			Worm->leftOrRight = false;
@@ -189,7 +201,7 @@ void Player1::Input(int elapsedTime, Input::KeyboardState* state)
 
 		if (state->IsKeyDown(Input::Keys::S))
 		{
-			Worm->_playerPosition->Y += _cPacmanSpeed * elapsedTime;
+			Worm->_playerPosition->Y += playerSpeed;
 			isMoving = true;
 			if (Worm->leftOrRight == true)
 				Worm->_playerDirection = 0;
@@ -199,7 +211,7 @@ void Player1::Input(int elapsedTime, Input::KeyboardState* state)
 
 		if (state->IsKeyDown(Input::Keys::W))
 		{
-			Worm->_playerPosition->Y -= _cPacmanSpeed * elapsedTime;
+			Worm->_playerPosition->Y -= playerSpeed;
 			isMoving = true;
 			if (Worm->leftOrRight == true)
 				Worm->_playerDirection = 0;
@@ -214,7 +226,39 @@ void Player1::Input(int elapsedTime, Input::KeyboardState* state)
 			else
 				Worm->_playerDirection = 3;
 		}
+
+		if (mouseState->LeftButton == Input::ButtonState::PRESSED)
+		{
+			cherry->_collectablePosition->X = mouseState->X;
+			cherry->_collectablePosition->Y = mouseState->Y;
+		}
+
+		if (state->IsKeyDown(Input::Keys::LEFTSHIFT))
+		{
+			Worm->speedMultiplier = 2.0f;
+		}
+		else
+		{
+			Worm->speedMultiplier = 1.0f;
+		}
+
+		if (state->IsKeyDown(Input::Keys::R))
+		{
+			if (cherry->_rKeyDown == false)
+			{
+				cherry->_collectablePosition->X = (rand() % Graphics::GetViewportWidth());
+				cherry->_collectablePosition->Y = (rand() % Graphics::GetViewportHeight());
+				cherry->_rKeyDown = true;
+			}
+		
+		}
+		else
+		{
+			cherry->_rKeyDown = false;
+		}
 	}
+
+	
 }
 
 

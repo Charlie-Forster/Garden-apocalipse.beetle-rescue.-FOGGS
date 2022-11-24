@@ -24,6 +24,7 @@ struct Player
 	int _playerFrame;
 	int _playerCurrentFrameTime;
 	bool leftOrRight;
+	float speedMultiplier;
 };
 
 
@@ -36,6 +37,7 @@ struct Collectable
 	Vector2* _collectablePosition;
 	
 	int _collectableCurrentFrameTime;
+	bool _rKeyDown;
 
 };
 
@@ -73,7 +75,7 @@ private:
 	
 
 	//input methods
-	void Input(int elapsedTime, Input::KeyboardState* state);
+	void Input(int elapsedTime, Input::KeyboardState* state, Input::MouseState* mouseState);
 
 	//check methods
 	void CheckViewportCollision();
