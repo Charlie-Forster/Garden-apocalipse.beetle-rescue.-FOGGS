@@ -39,11 +39,13 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 		Worm->dead = false;
 		
 	//initialise Moving enemys
-		for (int i = 0; i < ENEMYCOUNT; i++)
-		{
-			guy1[i] = new MovingEnemy();
-		}
-		
+	for (int i = 0; i < ENEMYCOUNT; i++)
+	{
+		guy1[i] = new MovingEnemy();
+		guy1[i]->direction = 0;
+		guy1[i]->speed = 0.2f;
+	}
+	
 
 	//Initialise important Game aspects
 	Graphics::Initialise(argc, argv, this, 1024, 768, false, 25, 25, "Pacman", 60);
@@ -77,7 +79,11 @@ Player1::~Player1()
 	for (int i = 0; i < ENEMYCOUNT; i++)
 	{
 		delete guy1[i];
+		delete guy1[i]->texture;
+		delete guy1[i]->sourceRect;
+		delete guy1[i]->position;
 	}
+	
 }
 
 void Player1::LoadContent()
@@ -99,6 +105,7 @@ void Player1::LoadContent()
 		collectables[i]->_collectableRect = new Rect(0.0f, 0.0f, 12, 12);
 		collectables[i]->_collectablePosition = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
 	}
+	delete collectableTexture;
 
 	//load cherry
 	cherry->_collectableBlueTexture = new Texture2D();
@@ -113,6 +120,15 @@ void Player1::LoadContent()
 	background->_menuBackground->Load("Textures/Transparency.png", false);
 	background->_menuRectangle = new Rect(0.0f, 0.0f, Graphics::GetViewportWidth(), Graphics::GetViewportHeight());
 	background->_menuStringPosition = new Vector2(Graphics::GetViewportWidth() / 2.0f, Graphics::GetViewportHeight() / 2.0f);
+
+	//load enemy
+	for (int i = 0; i < ENEMYCOUNT; i++)
+	{
+		guy1[i]->texture = new Texture2D;
+		guy1[i]->texture->Load("Textures / GhostBlue.png", false);
+		guy1[i]->position = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
+		guy1[i]->sourceRect = new Rect(0.0f, 0.0f, 20, 20);
+	}
 }
 
 void Player1::Update(int elapsedTime)
