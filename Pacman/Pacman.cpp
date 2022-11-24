@@ -36,7 +36,13 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 		Worm->_playerFrame = 0;
 		Worm->leftOrRight = true;
 		Worm->speedMultiplier = 1.0f;
+		Worm->dead = false;
 		
+	//initialise Moving enemys
+		for (int i = 0; i < ENEMYCOUNT; i++)
+		{
+			guy1[i] = new MovingEnemy();
+		}
 		
 
 	//Initialise important Game aspects
@@ -68,6 +74,10 @@ Player1::~Player1()
 		delete collectables[i];
 		delete collectables[i]->_collectableRect;
 	}
+	for (int i = 0; i < ENEMYCOUNT; i++)
+	{
+		delete guy1[i];
+	}
 }
 
 void Player1::LoadContent()
@@ -75,16 +85,17 @@ void Player1::LoadContent()
 
 	// Load Player
 	Worm->_playerTexture = new Texture2D();
-	Worm->_playerTexture->Load("Textures/wormcreature2.tga", false);
+	Worm->_playerTexture->Load("Textures/wormcreature2.png", false);
 	Worm->_playerPosition = new Vector2(350.0f, 350.0f);
 	Worm->_playerSourceRect = new Rect(0.0f, 0.0f, 32, 32);
 	
-
+	Texture2D* collectableTexture = new Texture2D();
+	collectableTexture->Load("Textures/MunchieInverted.png", false);
 	// Load Collectable
 	for (int i = 0; i < MUNCHIECOUNT; i++)
 	{
 		collectables[i]->_collectableBlueTexture = new Texture2D();
-		collectables[i]->_collectableBlueTexture->Load("Textures/MunchieInverted.png", true);
+		collectables[i]->_collectableBlueTexture = collectableTexture;
 		collectables[i]->_collectableRect = new Rect(0.0f, 0.0f, 12, 12);
 		collectables[i]->_collectablePosition = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
 	}
@@ -152,10 +163,13 @@ void Player1::Draw(int elapsedTime)
 	//draw cherry
 	SpriteBatch::Draw(cherry->_collectableBlueTexture, cherry->_collectablePosition, cherry->_collectableRect, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
 
+	if (!Worm->dead)
+	{
 		SpriteBatch::Draw(Worm->_playerTexture, Worm->_playerPosition, Worm->_playerSourceRect); // Draws Pacman
-		// Draws String
+	}
 
-		SpriteBatch::DrawString(stream.str().c_str(), _stringPosition, Color::Green);
+    
+	SpriteBatch::DrawString(stream.str().c_str(), _stringPosition, Color::Green);// Draws String
 		if (background->_paused)
 		{
 			std::stringstream menuStream;
@@ -177,55 +191,42 @@ void Player1::Input(int elapsedTime, Input::KeyboardState* state, Input::MouseSt
 	float playerSpeed = (_cPacmanSpeed * elapsedTime) * Worm->speedMultiplier;
 	if (!background->_paused)
 	{
-		bool isMoving = false;
 
-		
+		bool playerMoving = false;
 
 		// Checks if WASD keys are pressed and moves the player accordingly
 		if (state->IsKeyDown(Input::Keys::D))
 		{
 			Worm->_playerPosition->X += playerSpeed;
-
 			Worm->_playerDirection = 0;
-			isMoving = true;
-			Worm->leftOrRight = true;
-
+			playerMoving = true;
 		}
 		if (state->IsKeyDown(Input::Keys::A))
 		{
 			Worm->_playerPosition->X -= playerSpeed;
 			Worm->_playerDirection = 2;
-			isMoving = true;
-			Worm->leftOrRight = false;
+			playerMoving = true;
 		}
 
 		if (state->IsKeyDown(Input::Keys::S))
 		{
 			Worm->_playerPosition->Y += playerSpeed;
-			isMoving = true;
-			if (Worm->leftOrRight == true)
-				Worm->_playerDirection = 0;
-			else
-				Worm->_playerDirection = 2;
+				Worm->_playerDirection = 4;
+				playerMoving = true;
 		}
 
 		if (state->IsKeyDown(Input::Keys::W))
 		{
 			Worm->_playerPosition->Y -= playerSpeed;
-			isMoving = true;
-			if (Worm->leftOrRight == true)
-				Worm->_playerDirection = 0;
-			else
-				Worm->_playerDirection = 2;
+				Worm->_playerDirection = 1;
+				playerMoving = true;
 		}
 
-		if (isMoving == false)
+		if (!playerMoving)
 		{
-			if (Worm->leftOrRight == true)
-				Worm->_playerDirection = 1;
-			else
-				Worm->_playerDirection = 3;
+			Worm->_playerDirection = 3;
 		}
+
 
 		if (mouseState->LeftButton == Input::ButtonState::PRESSED)
 		{
@@ -334,4 +335,9 @@ void Player1::UpdateCollectableAnimation(int elapsedTime, int i)
 
 		collectables[i]->_collectableRect->Y = collectables[i]->_collectableRect->Height * collectables[i]->_collectableFrameCount;
 	
+}
+
+void Player1::UpdateEnemy(MovingEnemy*, int elapsedTime)
+{
+
 }

@@ -1,5 +1,7 @@
 #pragma once
 #define MUNCHIECOUNT 25
+#define ENEMYCOUNT 6
+
 // If Windows and not in Debug, this will run without a console window
 // You can use this to output information when debugging using cout or cerr
 #ifdef WIN32 
@@ -25,6 +27,7 @@ struct Player
 	int _playerCurrentFrameTime;
 	bool leftOrRight;
 	float speedMultiplier;
+	bool dead; // :(
 };
 
 
@@ -51,6 +54,15 @@ struct Menu
 	bool _pKeyDown;
 };
 
+struct MovingEnemy
+{
+	Vector2* position;
+	Texture2D* texture;
+	Rect* sourceRect;
+	int direction;
+	float speed;
+};
+
 // Declares the Player1 class which inherits from the Game class.
 // This allows us to overload the Game class methods to help us
 // load content, draw and update our game.
@@ -61,6 +73,7 @@ private:
 	//create struct instances
 	Player* Worm;
 	Collectable* collectables[MUNCHIECOUNT];
+	MovingEnemy* guy1[ENEMYCOUNT];
 	Menu* background;
 	Collectable* cherry;
 	// Position for String
@@ -80,10 +93,12 @@ private:
 	//check methods
 	void CheckViewportCollision();
 	void CheckPaused(Input::KeyboardState* state, Input::Keys pauseKeys);
+	void CheckEnemyCollisions();
 
 	//Update method
 	void UpdatePlayerAnimation(int elapsedTime);
 	void UpdateCollectableAnimation(int elapsedTime, int i);
+	void UpdateEnemy(MovingEnemy*, int elapsedTime);
 public:
 	
 
