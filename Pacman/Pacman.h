@@ -73,7 +73,7 @@ private:
 	//create struct instances
 	Player* Worm;
 	Collectable* collectables[MUNCHIECOUNT];
-	MovingEnemy* guy1[ENEMYCOUNT];
+	MovingEnemy* enemy1[ENEMYCOUNT];
 	Menu* background;
 	Collectable* cherry;
 	// Position for String
@@ -93,12 +93,12 @@ private:
 	//check methods
 	void CheckViewportCollision();
 	void CheckPaused(Input::KeyboardState* state, Input::Keys pauseKeys);
-	void CheckEnemyCollisions();
+	bool CheckEnemyCollisions();
 
 	//Update method
 	void UpdatePlayerAnimation(int elapsedTime);
 	void UpdateCollectableAnimation(int elapsedTime, int i);
-	void UpdateEnemy(MovingEnemy*, int elapsedTime);
+	void UpdateEnemy(MovingEnemy*, int elapsedTime, int i);
 public:
 	
 

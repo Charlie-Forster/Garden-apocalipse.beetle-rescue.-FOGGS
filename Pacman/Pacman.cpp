@@ -41,9 +41,9 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 	//initialise Moving enemys
 	for (int i = 0; i < ENEMYCOUNT; i++)
 	{
-		guy1[i] = new MovingEnemy();
-		guy1[i]->direction = 0;
-		guy1[i]->speed = 0.2f;
+		enemy1[i] = new MovingEnemy();
+		enemy1[i]->direction = 0;
+		enemy1[i]->speed = 0.2f;
 	}
 	
 
@@ -78,10 +78,10 @@ Player1::~Player1()
 	}
 	for (int i = 0; i < ENEMYCOUNT; i++)
 	{
-		delete guy1[i];
-		delete guy1[i]->texture;
-		delete guy1[i]->sourceRect;
-		delete guy1[i]->position;
+		delete enemy1[i];
+		delete enemy1[i]->texture;
+		delete enemy1[i]->sourceRect;
+		delete enemy1[i]->position;
 	}
 	
 }
@@ -124,10 +124,10 @@ void Player1::LoadContent()
 	//load enemy
 	for (int i = 0; i < ENEMYCOUNT; i++)
 	{
-		guy1[i]->texture = new Texture2D;
-		guy1[i]->texture->Load("Textures / GhostBlue.png", false);
-		guy1[i]->position = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
-		guy1[i]->sourceRect = new Rect(0.0f, 0.0f, 20, 20);
+		enemy1[i]->texture = new Texture2D;
+		enemy1[i]->texture->Load("Textures/GhostBlue.png", false);
+		enemy1[i]->position = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
+		enemy1[i]->sourceRect = new Rect(0.0f, 0.0f, 20, 20);
 	}
 }
 
@@ -153,6 +153,9 @@ void Player1::Update(int elapsedTime)
 		{
 			UpdateCollectableAnimation(elapsedTime, i);
 		}
+
+			UpdateEnemy(enemy1[i], elapsedTime, i);
+	
 	}
 
 }
@@ -182,6 +185,11 @@ void Player1::Draw(int elapsedTime)
 	if (!Worm->dead)
 	{
 		SpriteBatch::Draw(Worm->_playerTexture, Worm->_playerPosition, Worm->_playerSourceRect); // Draws Pacman
+	}
+
+	for (int i = 0; i < ENEMYCOUNT; i++)
+	{
+		SpriteBatch::Draw(enemy1[i]->texture, enemy1[i]->position, enemy1[i]->sourceRect);
 	}
 
     
@@ -353,7 +361,47 @@ void Player1::UpdateCollectableAnimation(int elapsedTime, int i)
 	
 }
 
-void Player1::UpdateEnemy(MovingEnemy*, int elapsedTime)
+void Player1::UpdateEnemy(MovingEnemy*, int elapsedTime, int i)
 {
+	if (enemy1[i]->direction == 0)
+	{
+		enemy1[i]->position->X += enemy1[i]->speed * elapsedTime; //moves right
+	}
+	else if (enemy1[i]->direction == 1)
+	{
+		enemy1[i]->position->X -= enemy1[i]->speed * elapsedTime; //moves left
+	}
+	if (enemy1[i]->position->X + enemy1[i]->sourceRect->Width >= Graphics::GetViewportWidth())
+	{
+		enemy1[i]->direction = 1; //change direction
+	}
+	if (enemy1[i]->position->X <= 0)
+	{
+		enemy1[i]->direction = 0; //change direction
+	}
+}
 
+bool Player1::CheckEnemyCollisions()
+{
+	int i = 0;
+
+	int pLeft = Worm->_playerPosition->X;
+	int pRight = Worm->_playerPosition->X + Worm->_playerSourceRect->Width;
+	int pTop = Worm->_playerPosition->Y;
+	int pBottom = Worm->_playerPosition->Y + Worm->_playerSourceRect->Height;
+
+	int eLeft = 0;
+	int eRight = 0;
+	int eTop = 0;
+	int eBottom = 0;
+
+	for (i = 0; i < ENEMYCOUNT; i++)
+	{
+		eLeft = enemy1[i]->position->X;
+		eRight = enemy1[i]->position->X + enemy1[i]->sourceRect->Width;
+		eTop = enemy1[i]->position->Y;
+		eBottom = enemy1[i]->position->Y + enemy1[i]->sourceRect->Height;
+
+		if((pLeft < eRight) && (pRight > eLeft)
+	}
 }
