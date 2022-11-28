@@ -27,7 +27,7 @@ struct Player
 	int _playerCurrentFrameTime;
 	bool leftOrRight;
 	float speedMultiplier;
-	bool dead; // :(
+	bool dead;
 };
 
 
@@ -93,12 +93,12 @@ private:
 	//check methods
 	void CheckViewportCollision();
 	void CheckPaused(Input::KeyboardState* state, Input::Keys pauseKeys);
-	bool CheckEnemyCollisions();
+	void CheckEnemyCollisions();
 
 	//Update method
 	void UpdatePlayerAnimation(int elapsedTime);
 	void UpdateCollectableAnimation(int elapsedTime, int i);
-	void UpdateEnemy(MovingEnemy*, int elapsedTime, int i);
+	void UpdateEnemy(MovingEnemy*, int elapsedTime);
 public:
 	
 

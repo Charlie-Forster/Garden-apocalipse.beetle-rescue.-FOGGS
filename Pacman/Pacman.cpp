@@ -154,8 +154,9 @@ void Player1::Update(int elapsedTime)
 			UpdateCollectableAnimation(elapsedTime, i);
 		}
 
-			UpdateEnemy(enemy1[i], elapsedTime, i);
-	
+			UpdateEnemy(enemy1[0], elapsedTime);
+			CheckEnemyCollisions();
+		
 	}
 
 }
@@ -203,8 +204,6 @@ void Player1::Draw(int elapsedTime)
 			SpriteBatch::DrawString(menuStream.str().c_str(), background->_menuStringPosition, Color::Red);
 		}
 		SpriteBatch::EndDraw(); // Ends Drawing
-	
-
 		
 }
 
@@ -361,27 +360,30 @@ void Player1::UpdateCollectableAnimation(int elapsedTime, int i)
 	
 }
 
-void Player1::UpdateEnemy(MovingEnemy*, int elapsedTime, int i)
+void Player1::UpdateEnemy(MovingEnemy*, int elapsedTime)
 {
-	if (enemy1[i]->direction == 0)
+	for (int i = 0; i < ENEMYCOUNT; i++)
 	{
-		enemy1[i]->position->X += enemy1[i]->speed * elapsedTime; //moves right
-	}
-	else if (enemy1[i]->direction == 1)
-	{
-		enemy1[i]->position->X -= enemy1[i]->speed * elapsedTime; //moves left
-	}
-	if (enemy1[i]->position->X + enemy1[i]->sourceRect->Width >= Graphics::GetViewportWidth())
-	{
-		enemy1[i]->direction = 1; //change direction
-	}
-	if (enemy1[i]->position->X <= 0)
-	{
-		enemy1[i]->direction = 0; //change direction
+		if (enemy1[i]->direction == 0)
+		{
+			enemy1[i]->position->X += enemy1[i]->speed * elapsedTime; //moves right
+		}
+		else if (enemy1[i]->direction == 1)
+		{
+			enemy1[i]->position->X -= enemy1[i]->speed * elapsedTime; //moves left
+		}
+		if (enemy1[i]->position->X + enemy1[i]->sourceRect->Width >= Graphics::GetViewportWidth())
+		{
+			enemy1[i]->direction = 1; //change direction
+		}
+		if (enemy1[i]->position->X <= 0)
+		{
+			enemy1[i]->direction = 0; //change direction
+		}
 	}
 }
 
-bool Player1::CheckEnemyCollisions()
+void Player1::CheckEnemyCollisions()
 {
 	int i = 0;
 
@@ -402,6 +404,9 @@ bool Player1::CheckEnemyCollisions()
 		eTop = enemy1[i]->position->Y;
 		eBottom = enemy1[i]->position->Y + enemy1[i]->sourceRect->Height;
 
-		if((pLeft < eRight) && (pRight > eLeft)
+		if ((pLeft < eRight) && (pRight > eLeft) && (pBottom > eTop) && (pTop < eBottom))
+		{
+			Worm->dead = true;
+		}
 	}
 }
