@@ -1,6 +1,6 @@
 #pragma once
 #define MUNCHIECOUNT 25
-#define ENEMYCOUNT 6
+#define ENEMYCOUNT 10
 
 // If Windows and not in Debug, this will run without a console window
 // You can use this to output information when debugging using cout or cerr
@@ -59,7 +59,8 @@ struct MovingEnemy
 	Vector2* position;
 	Texture2D* texture;
 	Rect* sourceRect;
-	int direction;
+	int xDirection;
+	int yDirection;
 	float speed;
 };
 
