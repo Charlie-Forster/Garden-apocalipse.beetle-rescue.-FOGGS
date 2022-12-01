@@ -80,6 +80,9 @@ private:
 	// Position for String
 	Vector2* _stringPosition;
 
+	//audio instances
+	SoundEffect* _pop;
+
 	//Constant data for game variables
 	const float _cPacmanSpeed;
 	const int _cPlayerFrameTime;
@@ -95,6 +98,7 @@ private:
 	void CheckViewportCollision();
 	void CheckPaused(Input::KeyboardState* state, Input::Keys pauseKeys);
 	void CheckEnemyCollisions();
+	void CheckMunchieCollisions();
 
 	//Update method
 	void UpdatePlayerAnimation(int elapsedTime);

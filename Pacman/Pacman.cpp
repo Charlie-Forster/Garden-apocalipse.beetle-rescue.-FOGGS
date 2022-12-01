@@ -1,6 +1,7 @@
 #include "Pacman.h"
 #include <time.h>
 #include <sstream>
+#include <iostream>
 
 
 
@@ -10,6 +11,10 @@
 Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f), _cPlayerFrameTime(250), _cMunchieFrameTime(500)
 
 {
+	
+	_pop = new SoundEffect();
+
+
 	srand(time(NULL));
 	//initialise collectables
 	for (int i = 0; i < MUNCHIECOUNT; i++)
@@ -49,6 +54,7 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 	
 
 	//Initialise important Game aspects
+	Audio::Initialise();
 	Graphics::Initialise(argc, argv, this, 1024, 768, false, 25, 25, "Pacman", 60);
 	Input::Initialise();
 
@@ -84,11 +90,14 @@ Player1::~Player1()
 		delete enemy1[i]->sourceRect;
 		delete enemy1[i]->position;
 	}
+	delete _pop;
 	
 }
 
 void Player1::LoadContent()
 {
+	//load audio
+	_pop->Load("Audio/pop.wav");
 
 	// Load Player
 	Worm->_playerTexture = new Texture2D();
@@ -110,7 +119,7 @@ void Player1::LoadContent()
 
 	//load cherry
 	cherry->_collectableBlueTexture = new Texture2D();
-	cherry->_collectableBlueTexture->Load("Textures/MunchieInverted.png", true);
+	cherry->_collectableBlueTexture->Load("Textures/cherry.png", true);
 	cherry->_collectablePosition = new Vector2(70.0f, 100.0f);
 	cherry->_collectableRect = new Rect(0.0f, 0.0f, 12, 12);
 	// Set string position
@@ -130,6 +139,7 @@ void Player1::LoadContent()
 		enemy1[i]->position = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
 		enemy1[i]->sourceRect = new Rect(0.0f, 0.0f, 20, 20);
 	}
+	
 }
 
 void Player1::Update(int elapsedTime)
@@ -156,8 +166,8 @@ void Player1::Update(int elapsedTime)
 		}
 
 			UpdateEnemy(enemy1[0], elapsedTime);
-			CheckEnemyCollisions();
-		
+		//	CheckEnemyCollisions();
+			CheckMunchieCollisions();
 	}
 
 }
@@ -436,3 +446,32 @@ void Player1::CheckEnemyCollisions()
 	}
 }
 
+void Player1::CheckMunchieCollisions()
+{
+	for (int i = 0; i < MUNCHIECOUNT; i++)
+	{
+		int pLeft = Worm->_playerPosition->X;
+		int pRight = Worm->_playerPosition->X + Worm->_playerSourceRect->Width;
+		int pTop = Worm->_playerPosition->Y;
+		int pBottom = Worm->_playerPosition->Y + Worm->_playerSourceRect->Width;
+
+		int mLeft = 0;
+		int mRight = 0;
+		int mTop = 0;
+		int mBottom = 0;
+
+		for (int i = 0; i < MUNCHIECOUNT; i++)
+		{
+			mLeft = collectables[i]->_collectablePosition->X;
+			mRight = collectables[i]->_collectablePosition->X + collectables[i]->_collectableRect->Width;
+			mTop = collectables[i]->_collectablePosition->Y;
+			mBottom = collectables[i]->_collectablePosition->Y + collectables[i]->_collectableRect->Height;
+
+			if ((pLeft < mRight) && (pRight > mLeft) && (pBottom > mTop) && (pTop < mBottom))
+			{
+				Audio::Play(_pop);
+				collectables[i]->_collectablePosition->Y = Graphics::GetViewportHeight() + 40;
+			}
+		}
+    }
+}
