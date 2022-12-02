@@ -1,15 +1,21 @@
 #include "Pacman.h"
 #include <time.h>
 #include <sstream>
+#include <iostream>
 
 
 
 
 
 
-Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f), _cPlayerFrameTime(250), _cMunchieFrameTime(500)
+Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f), _cPlayerFrameTime(250), _cMunchieFrameTime(500), _cEnemyFrameTime(120)
 
 {
+	//initialise audio
+	_pop = new SoundEffect();
+	_death = new SoundEffect();
+
+
 	srand(time(NULL));
 	//initialise collectables
 	for (int i = 0; i < MUNCHIECOUNT; i++)
@@ -37,6 +43,7 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 		Worm->leftOrRight = true;
 		Worm->speedMultiplier = 1.0f;
 		Worm->dead = false;
+		Worm->_collectableCount = 0;
 		
 	//initialise Moving enemys
 	for (int i = 0; i < ENEMYCOUNT; i++)
@@ -45,10 +52,13 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 		enemy1[i]->xDirection = rand() % 2;
 		enemy1[i]->yDirection = rand() % 2;
 		enemy1[i]->speed = 0.2f;
+		enemy1[i]->_enemyCurrentFrameTime = rand() % 100;
+
 	}
 	
 
 	//Initialise important Game aspects
+	Audio::Initialise();
 	Graphics::Initialise(argc, argv, this, 1024, 768, false, 25, 25, "Pacman", 60);
 	Input::Initialise();
 
@@ -84,11 +94,15 @@ Player1::~Player1()
 		delete enemy1[i]->sourceRect;
 		delete enemy1[i]->position;
 	}
-	
+	delete _pop;
+	delete _death;
 }
 
 void Player1::LoadContent()
 {
+	//load audio
+	_pop->Load("Audio/pop.wav");
+	//_death->Load("Audio/")
 
 	// Load Player
 	Worm->_playerTexture = new Texture2D();
@@ -97,7 +111,7 @@ void Player1::LoadContent()
 	Worm->_playerSourceRect = new Rect(0.0f, 0.0f, 32, 32);
 	
 	Texture2D* collectableTexture = new Texture2D();
-	collectableTexture->Load("Textures/MunchieInverted.png", false);
+	collectableTexture->Load("Textures/bug.png", false);
 	// Load Collectable
 	for (int i = 0; i < MUNCHIECOUNT; i++)
 	{
@@ -106,15 +120,17 @@ void Player1::LoadContent()
 		collectables[i]->_collectableRect = new Rect(0.0f, 0.0f, 12, 12);
 		collectables[i]->_collectablePosition = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
 	}
-	delete collectableTexture;
+	
 
 	//load cherry
 	cherry->_collectableBlueTexture = new Texture2D();
-	cherry->_collectableBlueTexture->Load("Textures/MunchieInverted.png", true);
+	cherry->_collectableBlueTexture->Load("Textures/cherry.png", true);
 	cherry->_collectablePosition = new Vector2(70.0f, 100.0f);
-	cherry->_collectableRect = new Rect(0.0f, 0.0f, 12, 12);
-	// Set string position
+	cherry->_collectableRect = new Rect(0.0f, 0.0f, 32, 32);
+	// Set string positions
 	_stringPosition = new Vector2(10.0f, 25.0f);
+	_bugStringPosition = new Vector2(4.0f, 50.0f);
+
 
 	//Set Menu Paramters
 	background->_menuBackground = new Texture2D();
@@ -126,10 +142,15 @@ void Player1::LoadContent()
 	for (int i = 0; i < ENEMYCOUNT; i++)
 	{
 		enemy1[i]->texture = new Texture2D;
-		enemy1[i]->texture->Load("Textures/GhostBlue.png", false);
+		enemy1[i]->texture->Load("Textures/fire.png", false);
 		enemy1[i]->position = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
 		enemy1[i]->sourceRect = new Rect(0.0f, 0.0f, 20, 20);
 	}
+
+	//load death animation
+	Worm->_deathAnimation = new Texture2D;
+	Worm->_deathAnimation->Load("Textures/death.png", false);
+	
 }
 
 void Player1::Update(int elapsedTime)
@@ -157,7 +178,8 @@ void Player1::Update(int elapsedTime)
 
 			UpdateEnemy(enemy1[0], elapsedTime);
 			CheckEnemyCollisions();
-		
+			UpdateEnemyAnimations(elapsedTime);
+			CheckCollectableCollisions();
 	}
 
 }
@@ -170,7 +192,9 @@ void Player1::Draw(int elapsedTime)
 
 	// Allows us to easily create a string
 	std::stringstream stream;
-	stream << "Pacman X: " << Worm->_playerPosition->X << " Y: " << Worm->_playerPosition->Y;
+	stream << "Player X: " << Worm->_playerPosition->X << " Y: " << Worm->_playerPosition->Y;
+	std::stringstream bugsCollectedstr;
+	bugsCollectedstr << " Bugs collected: " << Worm->_collectableCount;
 
 	SpriteBatch::BeginDraw(); // Starts Drawing
 
@@ -189,14 +213,19 @@ void Player1::Draw(int elapsedTime)
 	{
 		SpriteBatch::Draw(Worm->_playerTexture, Worm->_playerPosition, Worm->_playerSourceRect); // Draws Pacman
 	}
+	else
+	{
+		SpriteBatch::Draw(Worm->_deathAnimation, Worm->_playerPosition, Worm->_playerSourceRect);
+	}
 	//draw enemies
 	for (int i = 0; i < ENEMYCOUNT; i++)
 	{
 		SpriteBatch::Draw(enemy1[i]->texture, enemy1[i]->position, enemy1[i]->sourceRect);
 	}
 
-    
+	
 	SpriteBatch::DrawString(stream.str().c_str(), _stringPosition, Color::Green);// Draws String
+	SpriteBatch::DrawString(bugsCollectedstr.str().c_str(), _bugStringPosition, Color::Green);
 		if (background->_paused)
 		{
 			std::stringstream menuStream;
@@ -214,7 +243,7 @@ void Player1::Draw(int elapsedTime)
 void Player1::Input(int elapsedTime, Input::KeyboardState* state, Input::MouseState* mouseState)
 {
 	float playerSpeed = (_cPacmanSpeed * elapsedTime) * Worm->speedMultiplier;
-	if (!background->_paused)
+	if ((!background->_paused) && (!Worm->dead))
 	{
 
 		bool playerMoving = false;
@@ -327,18 +356,32 @@ void Player1::UpdatePlayerAnimation(int elapsedTime)
 {
 		//runs player animations based on the framerate
 	Worm->_playerCurrentFrameTime += elapsedTime;
+	int animationFrames;
+	if (Worm->dead == true)
+	{
+		animationFrames = 5;
+	}
+	else
+	{
+		animationFrames = 2;
+	}
 
 		if (Worm->_playerCurrentFrameTime > _cPlayerFrameTime)
 		{
-			Worm->_playerFrame++;
-			if (Worm->_playerFrame >= 2)
+			if (Worm->_playerFrame < 4)
 			{
-				Worm->_playerFrame = 0;
+				Worm->_playerFrame++;
+				if (Worm->_playerFrame >= animationFrames)
+				{
+					Worm->_playerFrame = 0;
+				}
 			}
 			Worm->_playerCurrentFrameTime = 0;
 		}
-
-		Worm->_playerSourceRect->Y = Worm->_playerSourceRect->Height * Worm->_playerDirection;
+		if (!Worm->dead)
+		{
+			Worm->_playerSourceRect->Y = Worm->_playerSourceRect->Height * Worm->_playerDirection;
+		}
 		Worm->_playerSourceRect->X = Worm->_playerSourceRect->Width * Worm->_playerFrame;
 }
 
@@ -388,12 +431,10 @@ void Player1::UpdateEnemy(MovingEnemy*, int elapsedTime)
 			if (enemy1[i]->position->X + enemy1[i]->sourceRect->Width >= Graphics::GetViewportWidth())
 			{
 				enemy1[i]->xDirection = 1; //change direction
-				enemy1[i]->sourceRect->X = 20;
 			}
 			else if (enemy1[i]->position->X <= 0)
 			{
 				enemy1[i]->xDirection = 0; //change direction
-				enemy1[i]->sourceRect->X = 0;
 			}
 
 			if (enemy1[i]->position->Y <= 0)
@@ -432,7 +473,58 @@ void Player1::CheckEnemyCollisions()
 		if ((pLeft < eRight) && (pRight > eLeft) && (pBottom > eTop) && (pTop < eBottom))
 		{
 			Worm->dead = true;
+			//Audio::Play(_death);
 		}
 	}
 }
 
+void Player1::CheckCollectableCollisions()
+{
+	for (int i = 0; i < MUNCHIECOUNT; i++)
+	{
+		int pLeft = Worm->_playerPosition->X;
+		int pRight = Worm->_playerPosition->X + Worm->_playerSourceRect->Width;
+		int pTop = Worm->_playerPosition->Y;
+		int pBottom = Worm->_playerPosition->Y + Worm->_playerSourceRect->Width;
+
+		int mLeft = 0;
+		int mRight = 0;
+		int mTop = 0;
+		int mBottom = 0;
+
+		for (int i = 0; i < MUNCHIECOUNT; i++)
+		{
+			mLeft = collectables[i]->_collectablePosition->X;
+			mRight = collectables[i]->_collectablePosition->X + collectables[i]->_collectableRect->Width;
+			mTop = collectables[i]->_collectablePosition->Y;
+			mBottom = collectables[i]->_collectablePosition->Y + collectables[i]->_collectableRect->Height;
+
+			if ((pLeft < mRight) && (pRight > mLeft) && (pBottom > mTop) && (pTop < mBottom))
+			{
+				Audio::Play(_pop);
+				collectables[i]->_collectablePosition->Y = Graphics::GetViewportHeight() + 40;
+				Worm->_collectableCount++;
+			}
+		}
+    }
+}
+
+void Player1::UpdateEnemyAnimations(int elapsedTime)
+{
+	for (int i = 0; i < ENEMYCOUNT; i++)
+	{
+		
+		enemy1[i]->_enemyCurrentFrameTime += elapsedTime;
+
+		if (enemy1[i]->_enemyCurrentFrameTime > _cEnemyFrameTime)
+		{
+			enemy1[i]->_enemyFrameCount++;
+
+			if (enemy1[i]->_enemyFrameCount >= 2)
+				enemy1[i]->_enemyFrameCount = 0;
+			enemy1[i]->_enemyCurrentFrameTime = 0;
+		}
+
+		enemy1[i]->sourceRect->X = enemy1[i]->sourceRect->Width * enemy1[i]->_enemyFrameCount;
+	}
+}

@@ -28,6 +28,8 @@ struct Player
 	bool leftOrRight;
 	float speedMultiplier;
 	bool dead;
+	Texture2D* _deathAnimation;
+	int _collectableCount;
 };
 
 
@@ -38,7 +40,6 @@ struct Collectable
 	Rect* _collectableRect;
 	Texture2D* _collectableBlueTexture;
 	Vector2* _collectablePosition;
-	
 	int _collectableCurrentFrameTime;
 	bool _rKeyDown;
 
@@ -62,6 +63,8 @@ struct MovingEnemy
 	int xDirection;
 	int yDirection;
 	float speed;
+	int _enemyFrameCount;
+	int _enemyCurrentFrameTime;
 };
 
 // Declares the Player1 class which inherits from the Game class.
@@ -79,11 +82,17 @@ private:
 	Collectable* cherry;
 	// Position for String
 	Vector2* _stringPosition;
+	Vector2* _bugStringPosition;
+
+	//audio instances
+	SoundEffect* _pop;
+	SoundEffect* _death;
 
 	//Constant data for game variables
 	const float _cPacmanSpeed;
 	const int _cPlayerFrameTime;
 	const int _cMunchieFrameTime;
+	const int _cEnemyFrameTime;
 
 	
 	
@@ -95,11 +104,13 @@ private:
 	void CheckViewportCollision();
 	void CheckPaused(Input::KeyboardState* state, Input::Keys pauseKeys);
 	void CheckEnemyCollisions();
+	void CheckCollectableCollisions();
 
 	//Update method
 	void UpdatePlayerAnimation(int elapsedTime);
 	void UpdateCollectableAnimation(int elapsedTime, int i);
 	void UpdateEnemy(MovingEnemy*, int elapsedTime);
+	void UpdateEnemyAnimations(int elapsedTime);
 public:
 	
 
