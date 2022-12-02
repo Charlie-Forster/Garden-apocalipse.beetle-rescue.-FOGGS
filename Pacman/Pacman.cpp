@@ -11,8 +11,9 @@
 Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f), _cPlayerFrameTime(250), _cMunchieFrameTime(500)
 
 {
-	
+	//initialise audio
 	_pop = new SoundEffect();
+	_death = new SoundEffect();
 
 
 	srand(time(NULL));
@@ -91,13 +92,14 @@ Player1::~Player1()
 		delete enemy1[i]->position;
 	}
 	delete _pop;
-	
+	delete _death;
 }
 
 void Player1::LoadContent()
 {
 	//load audio
 	_pop->Load("Audio/pop.wav");
+	//_death->Load("Audio/")
 
 	// Load Player
 	Worm->_playerTexture = new Texture2D();
@@ -106,7 +108,7 @@ void Player1::LoadContent()
 	Worm->_playerSourceRect = new Rect(0.0f, 0.0f, 32, 32);
 	
 	Texture2D* collectableTexture = new Texture2D();
-	collectableTexture->Load("Textures/MunchieInverted.png", false);
+	collectableTexture->Load("Textures/bug.png", false);
 	// Load Collectable
 	for (int i = 0; i < MUNCHIECOUNT; i++)
 	{
@@ -115,13 +117,13 @@ void Player1::LoadContent()
 		collectables[i]->_collectableRect = new Rect(0.0f, 0.0f, 12, 12);
 		collectables[i]->_collectablePosition = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
 	}
-	delete collectableTexture;
+	
 
 	//load cherry
 	cherry->_collectableBlueTexture = new Texture2D();
 	cherry->_collectableBlueTexture->Load("Textures/cherry.png", true);
 	cherry->_collectablePosition = new Vector2(70.0f, 100.0f);
-	cherry->_collectableRect = new Rect(0.0f, 0.0f, 12, 12);
+	cherry->_collectableRect = new Rect(0.0f, 0.0f, 32, 32);
 	// Set string position
 	_stringPosition = new Vector2(10.0f, 25.0f);
 
@@ -166,7 +168,7 @@ void Player1::Update(int elapsedTime)
 		}
 
 			UpdateEnemy(enemy1[0], elapsedTime);
-		//	CheckEnemyCollisions();
+			CheckEnemyCollisions();
 			CheckMunchieCollisions();
 	}
 
@@ -442,6 +444,7 @@ void Player1::CheckEnemyCollisions()
 		if ((pLeft < eRight) && (pRight > eLeft) && (pBottom > eTop) && (pTop < eBottom))
 		{
 			Worm->dead = true;
+			//Audio::Play(_death);
 		}
 	}
 }
@@ -471,6 +474,7 @@ void Player1::CheckMunchieCollisions()
 			{
 				Audio::Play(_pop);
 				collectables[i]->_collectablePosition->Y = Graphics::GetViewportHeight() + 40;
+				Worm->_playerDirection = 4;
 			}
 		}
     }
