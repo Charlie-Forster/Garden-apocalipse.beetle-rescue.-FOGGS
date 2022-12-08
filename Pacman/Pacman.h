@@ -87,6 +87,11 @@ private:
 	//audio instances
 	SoundEffect* _pop;
 	SoundEffect* _death;
+	
+	//misc
+	Texture2D* _gameBackground;
+	Rect* _gameBackgroundRect;
+	Vector2* _gamebackgroundPosition;
 
 	//Constant data for game variables
 	const float _cPacmanSpeed;

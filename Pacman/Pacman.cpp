@@ -25,9 +25,7 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 		collectables[i]._collectableFrameCount = 0;
 		collectables[i]._collectableCurrentFrameTime = 0;
 	}
-
-	//load background
-	Texture2D* Gamebackground = new Texture2D; //need to finish
+	
 	
 	//initialise draggable cherry
 	cherry = new Collectable();
@@ -99,6 +97,7 @@ Player1::~Player1()
 	}
 	delete _pop;
 	delete _death;
+	delete _gameBackground;
 }
 
 void Player1::LoadContent()
@@ -122,8 +121,21 @@ void Player1::LoadContent()
 		collectables[i]._collectableBlueTexture = collectableTexture;
 		collectables[i]._collectableRect = new Rect(0.0f, 0.0f, 12, 12);
 		collectables[i]._collectablePosition = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
+		if (collectables[i]._collectablePosition->X > 900)
+		{
+			collectables[i]._collectablePosition->X -= 100;
+		}
+		if (collectables[i]._collectablePosition->X < 100)
+		{
+			collectables[i]._collectablePosition->X += 100;
+		}
 	}
 	
+	//load gameplay background
+	_gameBackground = new Texture2D();
+	_gameBackground->Load("Textures/grund.png", false);
+	_gameBackgroundRect = new Rect(0.0f, 0.0f, 1024, 768);
+	_gamebackgroundPosition = new Vector2(0,0);
 
 	//load cherry
 	cherry->_collectableBlueTexture = new Texture2D();
@@ -131,8 +143,8 @@ void Player1::LoadContent()
 	cherry->_collectablePosition = new Vector2(70.0f, 100.0f);
 	cherry->_collectableRect = new Rect(0.0f, 0.0f, 32, 32);
 	// Set string positions
-	_stringPosition = new Vector2(10.0f, 25.0f);
-	_bugStringPosition = new Vector2(4.0f, 50.0f);
+	_stringPosition = new Vector2(100.0f, 25.0f);
+	_bugStringPosition = new Vector2(110.0f, 50.0f);
 
 
 	//Set Menu Paramters
@@ -201,7 +213,8 @@ void Player1::Draw(int elapsedTime)
 
 	SpriteBatch::BeginDraw(); // Starts Drawing
 
-	
+	SpriteBatch::Draw(_gameBackground, _gameBackgroundRect, nullptr);
+
 		// Draw Blue Munchie
 	for (int i = 0; i < MUNCHIECOUNT; i++)
 	{
@@ -227,7 +240,7 @@ void Player1::Draw(int elapsedTime)
 	}
 
 	
-	SpriteBatch::DrawString(stream.str().c_str(), _stringPosition, Color::Green);// Draws String
+	SpriteBatch::DrawString(stream.str().c_str(), _stringPosition, Color::White);// Draws String
 	SpriteBatch::DrawString(bugsCollectedstr.str().c_str(), _bugStringPosition, Color::Green);
 		if (background->_paused)
 		{
@@ -235,7 +248,7 @@ void Player1::Draw(int elapsedTime)
 			menuStream << "paused!";
 
 			SpriteBatch::Draw(background->_menuBackground, background->_menuRectangle, nullptr);
-			SpriteBatch::DrawString(menuStream.str().c_str(), background->_menuStringPosition, Color::Red);
+			SpriteBatch::DrawString(menuStream.str().c_str(), background->_menuStringPosition, Color::White);
 		}
 		SpriteBatch::EndDraw(); // Ends Drawing
 		
