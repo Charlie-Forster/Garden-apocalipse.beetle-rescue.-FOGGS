@@ -76,7 +76,7 @@ private:
 	
 	//create struct instances
 	Player* Worm;
-	Collectable* collectables[MUNCHIECOUNT];
+	Collectable* collectables;
 	MovingEnemy* enemy1[ENEMYCOUNT];
 	Menu* background;
 	Collectable* cherry;

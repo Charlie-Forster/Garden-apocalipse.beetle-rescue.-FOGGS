@@ -18,13 +18,16 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 
 	srand(time(NULL));
 	//initialise collectables
+
+	collectables = new Collectable[MUNCHIECOUNT];
 	for (int i = 0; i < MUNCHIECOUNT; i++)
 	{
-		collectables[i] = new Collectable();
-		collectables[i]->_collectableFrameCount = 0;
-		collectables[i]->_collectableCurrentFrameTime = 0;
+		collectables[i]._collectableFrameCount = 0;
+		collectables[i]._collectableCurrentFrameTime = 0;
 	}
 
+	//load background
+	Texture2D* Gamebackground = new Texture2D; //need to finish
 	
 	//initialise draggable cherry
 	cherry = new Collectable();
@@ -83,9 +86,9 @@ Player1::~Player1()
 
 	for (int i = 0; i < MUNCHIECOUNT; i++)
 	{
-		delete collectables[i]->_collectableBlueTexture;
-		delete collectables[i];
-		delete collectables[i]->_collectableRect;
+		delete collectables[i]._collectableBlueTexture;
+		delete collectables;
+		delete collectables[i]._collectableRect;
 	}
 	for (int i = 0; i < ENEMYCOUNT; i++)
 	{
@@ -115,10 +118,10 @@ void Player1::LoadContent()
 	// Load Collectable
 	for (int i = 0; i < MUNCHIECOUNT; i++)
 	{
-		collectables[i]->_collectableBlueTexture = new Texture2D();
-		collectables[i]->_collectableBlueTexture = collectableTexture;
-		collectables[i]->_collectableRect = new Rect(0.0f, 0.0f, 12, 12);
-		collectables[i]->_collectablePosition = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
+		collectables[i]._collectableBlueTexture = new Texture2D();
+		collectables[i]._collectableBlueTexture = collectableTexture;
+		collectables[i]._collectableRect = new Rect(0.0f, 0.0f, 12, 12);
+		collectables[i]._collectablePosition = new Vector2((rand() % Graphics::GetViewportWidth()), (rand() % Graphics::GetViewportHeight()));
 	}
 	
 
@@ -202,7 +205,7 @@ void Player1::Draw(int elapsedTime)
 		// Draw Blue Munchie
 	for (int i = 0; i < MUNCHIECOUNT; i++)
 	{
-		SpriteBatch::Draw(collectables[i]->_collectableBlueTexture, collectables[i]->_collectablePosition, collectables[i]->_collectableRect, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
+		SpriteBatch::Draw(collectables[i]._collectableBlueTexture, collectables[i]._collectablePosition, collectables[i]._collectableRect, Vector2::Zero, 1.0f, 0.0f, Color::White, SpriteEffect::NONE);
 	}
 
 	//draw cherry
@@ -390,18 +393,18 @@ void Player1::UpdatePlayerAnimation(int elapsedTime)
 void Player1::UpdateCollectableAnimation(int elapsedTime, int i)
 {
 	
-		collectables[i]->_collectableCurrentFrameTime += elapsedTime;
+		collectables[i]._collectableCurrentFrameTime += elapsedTime;
 
-		if (collectables[i]->_collectableCurrentFrameTime > _cMunchieFrameTime)
+		if (collectables[i]._collectableCurrentFrameTime > _cMunchieFrameTime)
 		{
-			collectables[i]->_collectableFrameCount++;
+			collectables[i]._collectableFrameCount++;
 
-			if (collectables[i]->_collectableFrameCount >= 2)
-				collectables[i]->_collectableFrameCount = 0;
-			collectables[i]->_collectableCurrentFrameTime = 0;
+			if (collectables[i]._collectableFrameCount >= 2)
+				collectables[i]._collectableFrameCount = 0;
+			collectables[i]._collectableCurrentFrameTime = 0;
 		}
 
-		collectables[i]->_collectableRect->Y = collectables[i]->_collectableRect->Height * collectables[i]->_collectableFrameCount;
+		collectables[i]._collectableRect->Y = collectables[i]._collectableRect->Height * collectables[i]._collectableFrameCount;
 	
 }
 
@@ -494,15 +497,15 @@ void Player1::CheckCollectableCollisions()
 
 		for (int i = 0; i < MUNCHIECOUNT; i++)
 		{
-			mLeft = collectables[i]->_collectablePosition->X;
-			mRight = collectables[i]->_collectablePosition->X + collectables[i]->_collectableRect->Width;
-			mTop = collectables[i]->_collectablePosition->Y;
-			mBottom = collectables[i]->_collectablePosition->Y + collectables[i]->_collectableRect->Height;
+			mLeft = collectables[i]._collectablePosition->X;
+			mRight = collectables[i]._collectablePosition->X + collectables[i]._collectableRect->Width;
+			mTop = collectables[i]._collectablePosition->Y;
+			mBottom = collectables[i]._collectablePosition->Y + collectables[i]._collectableRect->Height;
 
 			if ((pLeft < mRight) && (pRight > mLeft) && (pBottom > mTop) && (pTop < mBottom))
 			{
 				Audio::Play(_pop);
-				collectables[i]->_collectablePosition->Y = Graphics::GetViewportHeight() + 40;
+				collectables[i]._collectablePosition->Y = Graphics::GetViewportHeight() + 40;
 				Worm->_collectableCount++;
 			}
 		}
