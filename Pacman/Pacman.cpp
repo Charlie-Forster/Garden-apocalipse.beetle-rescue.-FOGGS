@@ -104,7 +104,7 @@ void Player1::LoadContent()
 {
 	//load audio
 	_pop->Load("Audio/pop.wav");
-	//_death->Load("Audio/")
+	_death->Load("Audio/matches.wav"); //https://www.soundjay.com/nature/sounds/matches-1.mp3 remember to cite the source
 
 	// Load Player
 	Worm->_playerTexture = new Texture2D();
@@ -488,8 +488,11 @@ void Player1::CheckEnemyCollisions()
 
 		if ((pLeft < eRight) && (pRight > eLeft) && (pBottom > eTop) && (pTop < eBottom))
 		{
+			if (Worm->dead == false)
+			{
+				Audio::Play(_death);
+			}
 			Worm->dead = true;
-			//Audio::Play(_death);
 		}
 	}
 }
