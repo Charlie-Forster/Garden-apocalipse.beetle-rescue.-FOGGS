@@ -23,7 +23,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Pacman.h">
+    <ClInclude Include="Garden Apocalypse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
