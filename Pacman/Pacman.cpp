@@ -174,7 +174,12 @@ void Player1::Update(int elapsedTime)
 	Input::KeyboardState* state = Input::Keyboard::GetState();
 	Input::MouseState* mouseState = Input::Mouse::GetState();
 
-
+	
+	if (Worm->_collectableCount >= MUNCHIECOUNT)
+	{
+		background->_pKeyDown = true;
+		background->_paused = true;
+	}
 	//call the pause method
 	CheckPaused(state, Input::Keys::P );
 	
@@ -195,6 +200,8 @@ void Player1::Update(int elapsedTime)
 			CheckEnemyCollisions();
 			UpdateEnemyAnimations(elapsedTime);
 			CheckCollectableCollisions();
+
+			
 	}
 
 }
@@ -245,12 +252,19 @@ void Player1::Draw(int elapsedTime)
 		if (background->_paused)
 		{
 			std::stringstream menuStream;
+			
 			menuStream << "paused!";
-
+			if (Worm->_collectableCount >= MUNCHIECOUNT)
+			{
+				menuStream.str("You Win!");
+			}
 			SpriteBatch::Draw(background->_menuBackground, background->_menuRectangle, nullptr);
 			SpriteBatch::DrawString(menuStream.str().c_str(), background->_menuStringPosition, Color::White);
 		}
+
+		
 		SpriteBatch::EndDraw(); // Ends Drawing
+
 		
 }
 

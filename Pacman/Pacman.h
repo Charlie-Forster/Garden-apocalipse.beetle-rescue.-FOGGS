@@ -1,5 +1,5 @@
 #pragma once
-#define MUNCHIECOUNT 25
+#define MUNCHIECOUNT 28
 #define ENEMYCOUNT 10
 
 // If Windows and not in Debug, this will run without a console window
