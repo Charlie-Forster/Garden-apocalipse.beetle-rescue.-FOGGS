@@ -14,6 +14,7 @@ Player1::Player1(int argc, char* argv[]) : Game(argc, argv), _cPacmanSpeed(0.1f)
 	//initialise audio
 	_pop = new SoundEffect();
 	_death = new SoundEffect();
+	_cherryMove = new SoundEffect();
 
 
 	srand(time(NULL));
@@ -98,6 +99,7 @@ Player1::~Player1()
 	delete _pop;
 	delete _death;
 	delete _gameBackground;
+	delete _cherryMove;
 }
 
 void Player1::LoadContent()
@@ -105,6 +107,7 @@ void Player1::LoadContent()
 	//load audio
 	_pop->Load("Audio/pop.wav");
 	_death->Load("Audio/matches.wav"); //https://www.soundjay.com/nature/sounds/matches-1.mp3 remember to cite the source
+	_cherryMove->Load("Audio/wscream_2.wav"); //https://opengameart.org/content/girly-scream // remember to cite
 
 	// Load Player
 	Worm->_playerTexture = new Texture2D();
@@ -334,12 +337,15 @@ void Player1::Input(int elapsedTime, Input::KeyboardState* state, Input::MouseSt
 				cherry->_collectablePosition->X = (rand() % Graphics::GetViewportWidth());
 				cherry->_collectablePosition->Y = (rand() % Graphics::GetViewportHeight());
 				cherry->_rKeyDown = true;
+				Audio::Play(_cherryMove);
+				
 			}
 		
 		}
 		else
 		{
 			cherry->_rKeyDown = false;
+			
 		}
 	}
 
@@ -364,20 +370,26 @@ void Player1::Input(int elapsedTime, Input::KeyboardState* state, Input::MouseSt
 
 
 
-void Player1::CheckViewportCollision()
-{
-	//collision with screen edges
-	if (Worm->_playerPosition->X > Graphics::GetViewportWidth())
-		Worm->_playerPosition->X = 0 - Worm->_playerSourceRect->Width;
+ void Player1::CheckViewportCollision()
+ {
+	 //collision with screen edges
+	 if (Worm->_playerPosition->X > Graphics::GetViewportWidth())
+	 {
+		 Worm->_playerPosition->X = 0 - Worm->_playerSourceRect->Width;
+	 }
+	 else if (Worm->_playerPosition->X < 0 - Worm->_playerSourceRect->Width)
+	 {
+		 Worm->_playerPosition->X = Graphics::GetViewportWidth();
+	 }
 
-	if (Worm->_playerPosition->X < 0 - Worm->_playerSourceRect->Width)
-		Worm->_playerPosition->X = Graphics::GetViewportWidth();
-
-	if (Worm->_playerPosition->Y > Graphics::GetViewportHeight())
-		Worm->_playerPosition->Y = 0 - Worm->_playerSourceRect->Height;
-
-	if (Worm->_playerPosition->Y < 0 - Worm->_playerSourceRect->Height)
-		Worm->_playerPosition->Y = Graphics::GetViewportHeight();
+	 if (Worm->_playerPosition->Y > Graphics::GetViewportHeight())
+	 {
+		 Worm->_playerPosition->Y = 0 - Worm->_playerSourceRect->Height;
+	 }
+	 else if (Worm->_playerPosition->Y < 0 - Worm->_playerSourceRect->Height)
+	 {
+		 Worm->_playerPosition->Y = Graphics::GetViewportHeight();
+	 }
 }
 
 

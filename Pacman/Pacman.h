@@ -87,6 +87,7 @@ private:
 	//audio instances
 	SoundEffect* _pop;
 	SoundEffect* _death;
+	SoundEffect* _cherryMove;
 	
 	//misc
 	Texture2D* _gameBackground;
